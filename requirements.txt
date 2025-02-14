@@ -12,3 +12,4 @@ python-dotenv==1.0.1
 celery==5.4.0
 gunicorn==21.2.0  # لتشغيل التطبيق على Render
 Flask-Bcrypt==1.0.1
+psycopg2-binary==2.9.10
