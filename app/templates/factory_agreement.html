@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white text-center">
+      <h4 class="mb-0">
+        <i class="bi bi-file-earmark-text"></i> اتفاقية تنفيذ طلبية
+      </h4>
+    </div>
+    <div class="card-body">
+      <!-- تفاصيل الاتفاقية وعرض المعلومات الأخرى تبقى دون تغيير -->
+      <p><strong>📌 الطرف الأول:</strong> منصة "جملة" (يُشار إليها بـ "المنصة").</p>
+      <p><strong>📌 الطرف الثاني:</strong> {{ agreement.company_name }}، سجل تجاري رقم [إضافة رقم السجل لاحقًا].</p>
+      <!-- باقي تفاصيل الاتفاقية ... -->
+      <h5 class="mt-4">1. موضوع الاتفاق</h5>
+      <ul>
+        <li>📦 <strong>رقم الطلبية:</strong> {{ agreement.order.id }}</li>
+        <li>🛒 <strong>نوع المنتج:</strong> {{ agreement.order.name }}</li>
+        <li>📊 <strong>الكمية المطلوبة:</strong> {{ agreement.order.quantity_needed }} كرتون</li>
+        <li>💰 <strong>سعر الكرتون شامل الضريبة (15%):</strong> {{ agreement.order.price_per_carton }} ريال</li>
+        <li>💰 <strong>إجمالي قيمة الطلبية:</strong> {{ agreement.order.total_price }} ريال</li>
+        <li>💰 <strong>العمولة المستحقة للمنصة:</strong> {{ agreement.commission }} ريال لكل كرتون</li>
+      </ul>
+
+      <h5 class="mt-4">2. تفاصيل الحساب المالي لكل كرتون</h5>
+      <ul>
+        <li>💵 <strong>المبلغ قبل الضريبة:</strong> {{ "%.2f"|format(agreement.order.price_per_carton / 1.15) }} ريال</li>
+        <li>🧾 <strong>ضريبة القيمة المضافة (15%):</strong> {{ "%.2f"|format(agreement.order.price_per_carton - (agreement.order.price_per_carton / 1.15)) }} ريال</li>
+        <li>💰 <strong>عمولة المنصة:</strong> {{ agreement.commission }} ريال لكل كرتون</li>
+        <li>🏦 <strong>الصافي الذي يحصل عليه المورد:</strong> {{ "%.2f"|format((agreement.order.price_per_carton / 1.15) - agreement.commission) }} ريال لكل كرتون</li>
+      </ul>
+
+      <h5 class="mt-4">3. آلية الدفع</h5>
+      <ul>
+        <li>🔄 يتم تحويل مبلغ الطلبية من العملاء مباشرة إلى حساب المورد دون تدخل المنصة.</li>
+        <li>💰 يلتزم المورد بسداد {{ agreement.commission }} ريال لكل كرتون لصالح مالك المنصة محمد حسن محمد الحربي (إدارة وتنشيط المبيعات) رقم ترخيص: FL-65182703 بعد إكمال الطلبية.</li>
+        <li>📅 يتم دفع العمولة خلال <strong>3 أيام</strong> من تاريخ إكمال الطلبية.</li>
+      </ul>
+
+      <h5 class="mt-4">7. الأحكام العامة</h5>
+      <ul>
+        <li>✅ يعتبر هذا الاتفاق ساريًا بمجرد تأكيد الطلبية عبر المنصة.</li>
+        <li>⚖️ أي نزاع يتم حله بالتفاوض المباشر، وإن تعذر ذلك يتم اللجوء إلى الجهات المختصة.</li>
+      </ul>
+
+      {% if agreement.status == "approved" %}
+      <div class="alert alert-success mt-4">
+        ✅ تم الموافقة على الاتفاقية في {{ agreement.approval_date.strftime('%Y-%m-%d') }}
+        <br> ✍ <strong>الموقع:</strong> {{ agreement.signatory_name }} - {{ agreement.signatory_title }}
+      </div>
+      {% else %}
+      <div class="mt-4 p-3 bg-light border rounded">
+        <form method="POST" action="{{ url_for('main_routes.approve_factory_agreement', agreement_id=agreement.id) }}">
+          {{ form.hidden_tag() }}
+          
+          <div class="mb-3">
+            <label for="{{ form.signatory_name.id }}" class="form-label">📝 اسم الموقع الرسمي</label>
+            {{ form.signatory_name(class="form-control", id=form.signatory_name.id, placeholder="أدخل اسم الموقع الرسمي") }}
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.signatory_title.id }}" class="form-label">🏷️ الصفة (مالك، مدير، إلخ)</label>
+            {{ form.signatory_title(class="form-control", id=form.signatory_title.id, placeholder="أدخل الصفة") }}
+          </div>
+
+          <!-- الحقول المخفية تُدرج تلقائيًا -->
+          {{ form.bank_name }}
+          {{ form.bank_account_number }}
+          {{ form.iban_number }}
+          {{ form.commercial_registration }}
+          
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> {{ form.submit.label.text }}
+          </button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

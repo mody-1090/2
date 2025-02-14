@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}الملف الشخصي - جملة{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-center">👤 الملف الشخصي</h2>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card shadow">
+        <div class="card-body text-center">
+          <h4 class="card-title">{{ user.username }}</h4>
+          <p class="card-text"><strong>📧 البريد الإلكتروني:</strong> {{ user.email }}</p>
+          <p class="card-text"><strong>📱 رقم الهاتف:</strong> {{ user.phone if user.phone else "غير مسجل" }}</p>
+
+          <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            ✏️ تعديل المعلومات
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🔹 نافذة تعديل البيانات -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProfileModalLabel">✏️ تعديل الملف الشخصي</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('main_routes.update_profile') }}">
+          <div class="mb-3">
+            <label class="form-label">👤 اسم المستخدم</label>
+            <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">📧 البريد الإلكتروني</label>
+            <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">📱 رقم الهاتف</label>
+            <input type="text" class="form-control" name="phone" value="{{ user.phone if user.phone else '' }}">
+          </div>
+          <button type="submit" class="btn btn-success w-100">💾 حفظ التعديلات</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

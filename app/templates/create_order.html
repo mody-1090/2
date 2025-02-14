@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}إنشاء طلبية جديدة - جملة{% endblock %}
+
+{% block content %}
+<h2>إنشاء طلبية جديدة</h2>
+<form method="POST" action="{{ url_for('create_order') }}">
+  <div class="mb-3">
+    <label for="product_name" class="form-label">اسم المنتج</label>
+    <input
+      type="text"
+      class="form-control"
+      id="product_name"
+      name="product_name"
+      placeholder="أدخل اسم المنتج"
+      required
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="description" class="form-label">وصف المنتج</label>
+    <textarea
+      class="form-control"
+      id="description"
+      name="description"
+      rows="4"
+      placeholder="أدخل وصفًا كاملاً للمنتج"
+      required
+    ></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label for="quantity" class="form-label">الكمية المطلوبة</label>
+    <input
+      type="number"
+      class="form-control"
+      id="quantity"
+      name="quantity"
+      min="1"
+      required
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="min_contribution" class="form-label">الحد الأدنى للمساهمة</label>
+    <input
+      type="number"
+      class="form-control"
+      id="min_contribution"
+      name="min_contribution"
+      min="1"
+      required
+    />
+  </div>
+
+  <!-- يمكن إضافة حقل صور للمنتج إن أردت رفع ملفات -->
+  <!-- <div class="mb-3">
+    <label for="product_images" class="form-label">صور المنتج</label>
+    <input
+      type="file"
+      class="form-control"
+      id="product_images"
+      name="product_images"
+      multiple
+    />
+  </div> -->
+
+  <button type="submit" class="btn btn-primary">إنشاء الطلب</button>
+</form>
+{% endblock %}

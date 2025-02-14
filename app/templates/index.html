@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}الصفحة الرئيسية - جملة{% endblock %}
+
+{% block content %}
+
+<!-- قسم البطل (Hero Section) -->
+<section id="hero" class="hero-section d-flex align-items-center text-white" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('/static/images/hero-bg-creative.jpg') no-repeat center center; background-size: cover; height: 100vh;">
+  <div class="container text-center">
+    <h1 class="display-3 fw-bold animate__animated animate__fadeInDown">منصة جملة</h1>
+    <p class="lead animate__animated animate__fadeInUp">الحل الذكي للتجارة بالجملة عبر الوسطاء</p>
+    <a href="{{ url_for('main_routes.open_orders') }}" class="btn btn-custom btn-lg animate__animated animate__zoomIn">🚀 ابدأ الآن</a>
+  </div>
+</section>
+
+<!-- قسم "ما هي منصة جملة؟" -->
+<section id="what-is" class="py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <!-- الصورة التوضيحية -->
+      <div class="col-md-6 order-md-2 mb-4">
+        <img src="/static/images/about-global.jpg" alt="ما هي منصة جملة" class="img-fluid rounded shadow animate__animated animate__fadeInRight">
+      </div>
+      <div class="col-md-6 order-md-1">
+        <h2 class="mb-4">ما هي منصة جملة؟</h2>
+        <p class="lead">
+          جملة هي منصة متخصصة في تسهيل التجارة بالجملة، حيث يمكن للشركات الصغيرة والتجار والأفراد الانضمام إلى الطلبيات المفتوحة عبر وسطاء معتمدين، مما يمنحهم فرصة الحصول على المنتجات بأسعار الجملة بدون الحاجة إلى شراء كميات ضخمة بمفردهم.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- قسم "كيف تعمل منصة جملة؟" -->
+<section id="how-it-works" class="bg-light py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2>كيف تعمل منصة جملة؟</h2>
+      <p class="lead">رحلة بسيطة تبدأ من إنشاء الطلب حتى التوصيل</p>
+    </div>
+    <div class="row">
+      <!-- الخطوة 1: إنشاء الطلبات -->
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm p-4 animate__animated animate__fadeInUp">
+          <h4 class="mb-3"><i class="bi bi-building text-primary"></i> إنشاء الطلبات</h4>
+          <ul class="list-unstyled">
+            <li>✅ اسم المنتج وصوره 📷</li>
+            <li>✅ الحد الأدنى للمشاركة لكل وسيط</li>
+            <li>✅ الكمية المطلوبة وسعر الكرتونة</li>
+            <li>✅ مكافأة الوسيط على كل كرتونة</li>
+            <li>✅ المدن المتاحة للتوصيل</li>
+            <li>✅ مدة الطلبية وموعد الإغلاق</li>
+          </ul>
+          <p class="small text-muted">يتم إنشاء الطلبات من قبل إدارة الموقع أو المصانع المتعاونة.</p>
+        </div>
+      </div>
+      <!-- الخطوة 2: دور الوسطاء -->
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm p-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+          <h4 class="mb-3"><i class="bi bi-people text-primary"></i> دور الوسطاء</h4>
+          <ul class="list-unstyled">
+            <li>✅ استقطاب العملاء وإضافتهم للطلبيات المفتوحة</li>
+            <li>✅ تسجيل بيانات العملاء (الاسم، رقم الهاتف، عدد الكراتين، واسم المسؤول)</li>
+            <li>✅ الحصول على عمولة لكل كرتونة يتم بيعها</li>
+            <li>✅ متابعة حالة الطلبات حتى التسليم</li>
+          </ul>
+          <p class="small text-muted">الوسطاء هم الحلقة الأساسية بين المصنع والمشترين.</p>
+        </div>
+      </div>
+      <!-- الخطوة 3: كيفية الانضمام -->
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm p-4 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+          <h4 class="mb-3"><i class="bi bi-person-check text-primary"></i> كيف ينضم المستخدمون؟</h4>
+          <ul class="list-unstyled">
+            <li>🔹 لا يمكن للعملاء الانضمام مباشرة، بل يتواصلون مع وسيط معتمد</li>
+            <li>🔹 يقوم الوسيط بتسجيل الطلب عبر النظام</li>
+            <li>🔹 تظهر الطلبات في لوحة تحكم المشرف للمراجعة</li>
+          </ul>
+          <p class="small text-muted">تضمن هذه الآلية مراجعة وتوثيق الطلبات بدقة.</p>
+        </div>
+      </div>
+      <!-- الخطوة 4: الموافقة والتنفيذ -->
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm p-4 animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+          <h4 class="mb-3"><i class="bi bi-truck text-primary"></i> الموافقة والتنفيذ</h4>
+          <ul class="list-unstyled">
+            <li>✅ مراجعة الطلبات من قبل المشرف</li>
+            <li>✅ إدراج الطلبات المعتمدة في النظام للتنفيذ</li>
+            <li>✅ تحديث نسبة اكتمال الطلبية تلقائيًا</li>
+            <li>✅ تنسيق التوصيل مباشرةً من المصنع أو عبر حلول توصيل متكاملة</li>
+          </ul>
+          <p class="small text-muted">يتم تنفيذ الطلب بعد التأكد من صحة البيانات والموافقة عليها.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- قسم "مميزات منصة جملة" -->
+<section id="advantages" class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2>مميزات منصة جملة</h2>
+      <p class="lead">حلول مبتكرة تسهل التجارة بالجملة</p>
+    </div>
+    <div class="row">
+      <!-- ميزة 1 -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm text-center p-4 animate__animated animate__fadeInUp">
+          <i class="bi bi-check2-circle display-4 text-success mb-3"></i>
+          <h5 class="card-title">سهولة الشراء</h5>
+          <p class="card-text">احصل على المنتجات بأسعار الجملة دون الحاجة لشراء كميات ضخمة.</p>
+        </div>
+      </div>
+      <!-- ميزة 2 -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm text-center p-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+          <i class="bi bi-currency-dollar display-4 text-success mb-3"></i>
+          <h5 class="card-title">نظام وساطة فعال</h5>
+          <p class="card-text">يتيح للوسطاء تحقيق أرباح إضافية مع عمولات مجزية على كل كرتونة.</p>
+        </div>
+      </div>
+      <!-- ميزة 3 -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm text-center p-4 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+          <i class="bi bi-bar-chart-line display-4 text-success mb-3"></i>
+          <h5 class="card-title">إدارة ذكية</h5>
+          <p class="card-text">تابع حالة الطلبات والتحديثات في الوقت الفعلي عبر لوحة تحكم متطورة.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- قسم "الفئات المستفيدة" -->
+<section id="beneficiaries" class="bg-light py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">الفئات المستفيدة</h2>
+      <p class="lead">منصة جملة مُصممة لتلبية احتياجات متعددة بأعلى مستويات الاحترافية</p>
+    </div>
+    <div class="row">
+      <!-- التجار الصغار -->
+      <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow-sm h-100 p-4 text-center">
+          <div class="mb-3">
+            <i class="bi bi-shop-window display-4 text-primary"></i>
+          </div>
+          <h5 class="card-title">التجار الصغار</h5>
+          <p class="card-text">للحصول على منتجات بأسعار الجملة، مما يساعدهم على النمو والتنافس في السوق.</p>
+        </div>
+      </div>
+      <!-- الأفراد -->
+      <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow-sm h-100 p-4 text-center">
+          <div class="mb-3">
+            <i class="bi bi-person display-4 text-primary"></i>
+          </div>
+          <h5 class="card-title">الأفراد</h5>
+          <p class="card-text">للحصول على منتجات بأسعار مخفضة تلبي احتياجاتهم دون استثمارات ضخمة.</p>
+        </div>
+      </div>
+      <!-- رواد الأعمال -->
+      <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow-sm h-100 p-4 text-center">
+          <div class="mb-3">
+            <i class="bi bi-briefcase display-4 text-primary"></i>
+          </div>
+          <h5 class="card-title">رواد الأعمال</h5>
+          <p class="card-text">لاستثمار فرص السوق وتحقيق أرباح من خلال دورهم كوسطاء.</p>
+        </div>
+      </div>
+      <!-- المصانع والموردون -->
+      <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow-sm h-100 p-4 text-center">
+          <div class="mb-3">
+            <i class="bi bi-truck display-4 text-primary"></i>
+          </div>
+          <h5 class="card-title">المصانع والموردون</h5>
+          <p class="card-text">لتوزيع المنتجات بكفاءة عالية وتوسيع نطاق العمل من خلال شراكات استراتيجية.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- قسم الدعوة لاتخاذ إجراء (Call To Action) -->
+<section id="cta" class="py-5" style="background: linear-gradient(rgba(13,110,253,0.8), rgba(13,110,253,0.8)), url('/static/images/cta-bg-global.jpg') no-repeat center center; background-size: cover; position: relative;">
+  <div class="container text-center text-white position-relative" style="z-index: 2;">
+    <h2 class="display-4 fw-bold mb-3">انطلق مع منصة جملة اليوم!</h2>
+    <p class="lead mb-4">انضم إلى شبكة الوسطاء العالمية واستفد من أفضل الأسعار والفرص التجارية.</p>
+    <a href="{{ url_for('main_routes.open_orders') }}" class="btn btn-lg btn-custom">ابدأ الآن</a>
+  </div>
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.4);"></div>
+</section>
+
+{% endblock %}

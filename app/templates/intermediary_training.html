@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}🎓 دورة تدريبية للوسطاء{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- 🏆 عنوان الصفحة -->
+  <div class="row mb-4">
+    <div class="col text-center">
+      <h2 class="display-4">
+        <i class="bi bi-mortarboard"></i> دورة تدريبية للوسطاء
+      </h2>
+      <p class="lead text-muted">تعلم كيفية العمل كوسيط في منصة جملة خطوة بخطوة.</p>
+    </div>
+  </div>
+
+  <!-- 📺 فيديوهات تعليمية 
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">🚀 مقدمة عن منصة جملة</h5>
+        </div>
+        <div class="card-body text-center">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/your_video_id" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">🛒 كيف تنضم إلى طلبية</h5>
+        </div>
+        <div class="card-body text-center">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/your_video_id" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">📝 كيف تضيف عميلًا إلى الطلبية</h5>
+        </div>
+        <div class="card-body text-center">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/your_video_id" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">💰 كيف تتابع أرباحك</h5>
+        </div>
+        <div class="card-body text-center">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/your_video_id" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>-->
+
+  <!-- 🔹 دليل كتابي -->
+  <div class="card shadow mt-4">
+    <div class="card-header bg-success text-white">
+      <h4 class="mb-0">📘 دليل العمل كوسيط</h4>
+    </div>
+    <div class="card-body">
+      <h5>1️⃣ تسجيل الدخول وإنشاء حساب</h5>
+      <p>للتسجيل كوسيط، انتقل إلى صفحة التسجيل واملأ بياناتك الأساسية. تأكد من إدخال بريدك الإلكتروني ورقم الجوال بشكل صحيح.</p>
+
+      <h5>2️⃣ كيفية الانضمام إلى طلبية</h5>
+      <p>بعد تسجيل الدخول، توجه إلى <strong>الطلبات المفتوحة</strong>، واختر الطلبية التي تريد الانضمام إليها واضغط على زر "انضم كوسيط".</p>
+
+      <h5>3️⃣ كيفية إضافة العملاء</h5>
+      <p>عند الدخول إلى لوحة التحكم الخاصة بك، ستجد روابط خاصة لتسجيل العملاء في الطلبيات التي انضممت إليها. يمكنك إرسال الرابط إلى عملائك ليقوموا بالتسجيل بأنفسهم.</p>
+
+      <h5>4️⃣ كيفية متابعة أرباحك</h5>
+      <p>يمكنك رؤية جميع العملاء الذين أضفتهم، بالإضافة إلى أرباحك المتوقعة من كل طلبية.</p>
+
+      <h5>5️⃣ تواصل مع الدعم</h5>
+      <p>إذا واجهتك أي مشاكل، يمكنك التواصل مع فريق الدعم عبر صفحة <a href="{{ url_for('main_routes.contact') }}">اتصل بنا</a>.</p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
