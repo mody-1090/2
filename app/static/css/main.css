@@ -1,0 +1,143 @@
+/*--------------------------------------
+  إعدادات أساسية
+---------------------------------------*/
+
+/* استخدام خط عربي عصري */
+@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap");
+
+html {
+  direction: rtl; /* لضمان الاتجاه من اليمين إلى اليسار */
+}
+
+body {
+  font-family: "Tajawal", sans-serif;
+  background-color: #f5f7fa; /* خلفية ناعمة */
+  margin: 0;
+  padding: 0;
+  color: #333; /* لون النص الافتراضي */
+}
+
+/*--------------------------------------
+  شريط التنقل (Navbar)
+---------------------------------------*/
+
+.navbar {
+  background-color: #0d6efd; /* لون أزرق مميز */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* ظل خفيف */
+}
+
+.navbar .navbar-brand {
+  color: #050000;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.navbar .nav-link {
+  color: #000000;
+  margin-right: 10px;
+  transition: color 0.3s ease-in-out;
+}
+
+.navbar .nav-link:hover {
+  color: #ffc107; /* لون ذهبي عند التمرير */
+}
+
+.navbar .btn {
+  font-weight: 700;
+}
+
+/*--------------------------------------
+  أزرار مخصصة
+---------------------------------------*/
+
+.btn-custom {
+  background-color: #0d6efd; /* أزرق */
+  color: #fff;
+  border: none;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-custom:hover {
+  background-color: #0b5ed7; /* أزرق غامق عند التمرير */
+}
+
+/*--------------------------------------
+  محتوى الصفحة
+---------------------------------------*/
+
+h1, h2, h3, h4, h5 {
+  color: #0d6efd; /* لون أزرق للعناوين */
+  font-weight: 700;
+}
+
+.card {
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.02); /* تكبير بسيط عند التمرير */
+}
+
+/*--------------------------------------
+  الشريط السفلي (Footer)
+---------------------------------------*/
+
+footer {
+  background-color: #0d6efd;
+  color: #000000;
+  padding: 10px 0;
+}
+
+footer a {
+  color: #000000;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/*--------------------------------------
+  وضع داكن
+---------------------------------------*/
+
+.dark-mode {
+  background-color: #1a1a1a; /* خلفية داكنة */
+  color: #eaeaea; /* نص فاتح */
+}
+
+.dark-mode a {
+  color: #0d6efd; /* الروابط تبقى واضحة */
+}
+
+.dark-mode a:hover {
+  color: #ffc107; /* لون ذهبي عند التمرير */
+}
+
+.dark-mode .navbar {
+  background-color: #333; /* شريط التنقل بلون داكن */
+}
+
+.dark-mode .nav-link {
+  color: #eaeaea; /* النصوص داخل شريط التنقل */
+}
+
+.dark-mode .nav-link:hover {
+  color: #ffc107; /* لون ذهبي عند التمرير */
+}
+
+.dark-mode .btn-custom {
+  background-color: #444;
+  color: #eaeaea;
+}
+
+.dark-mode .btn-custom:hover {
+  background-color: #555;
+}
+
+.dark-mode footer {
+  background-color: #222;
+  color: #eaeaea;
+}
