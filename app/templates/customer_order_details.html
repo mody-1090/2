@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-header bg-info text-white text-center">
+      <h4 class="mb-0">
+        <i class="bi bi-receipt"></i> تفاصيل الطلب
+      </h4>
+    </div>
+    
+    <div class="card-body">
+      
+      <!-- 📝 تعريف المستند حسب الحالة -->
+      <div class="alert {% if participant.status == 'under_review' %}alert-warning text-dark
+                        {% elif participant.status == 'approved' %}alert-success
+                        {% else %}alert-danger{% endif %}">
+        {% if participant.status == "under_review" %}
+          🔹 هذا المستند يمثل <strong>سند استلام طلبية</strong>، وهو قيد المراجعة من قبل الإدارة.
+        {% elif participant.status == "approved" %}
+          ✅ هذا المستند يمثل <strong>سند استلام مبلغ</strong> نيابة عن المورد، حيث تمت الموافقة على الطلبية رسميًا.
+        {% else %}
+          ❌ هذا المستند يعتبر <strong>ملغى</strong>. في حال تم رفض الطلب بالخطأ أو لأسباب أخرى، يعتبر إيصال التحويل بمثابة <strong>سند استرجاع</strong>.
+        {% endif %}
+      </div>
+
+      <h5 class="text-center mb-4">📦 رقم الطلب: {{ participant.id }}</h5>
+
+      <!-- 📌 تفاصيل الطلب -->
+      <ul class="list-group">
+        <li class="list-group-item"><strong>🏪 المتجر:</strong> {{ participant.store_name }}</li>
+        <li class="list-group-item"><strong>👤 اسم المسؤول:</strong> {{ participant.responsible_person }}</li>
+        <li class="list-group-item"><strong>📍 الموقع:</strong> {{ participant.location }}</li>
+        <li class="list-group-item"><strong>📦 عدد الكراتين المطلوبة:</strong> {{ participant.cartons_requested }}</li>
+        <li class="list-group-item"><strong>🛒 نوع المنتج:</strong> {{ participant.order.name }}</li>
+        <li class="list-group-item"><strong>💰 المبلغ المدفوع:</strong> {{ participant.cartons_requested * participant.order.price_per_carton }} ريال</li>
+        <li class="list-group-item"><strong>📅 حالة الطلب:</strong>
+          {% if participant.status == "under_review" %}
+            <span class="badge bg-warning text-dark">⏳ قيد المراجعة</span>
+          {% elif participant.status == "approved" %}
+            <span class="badge bg-success">✅ مقبول</span>
+          {% else %}
+            <span class="badge bg-danger">❌ مرفوض</span>
+          {% endif %}
+        </li>
+      </ul>
+   
+
+
+
+      {% if participant_features %}
+  <div class="mt-4">
+    <h5>🎨 مميزات الطلب المسجلة لهذا العميل:</h5>
+    <ul class="list-group">
+      {% for pf in participant_features %}
+        <li class="list-group-item">
+          <strong>ميزة رقم {{ pf.feature_id }}</strong> - 
+          <span class="badge bg-primary">{{ pf.quantity }} كرتونة</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% else %}
+  <p class="text-muted">⚠️ لم يتم تسجيل أي ميزات لهذا العميل.</p>
+{% endif %}
+
+
+
+<!-- ⚠️ تنبيه العميل بالاحتفاظ بالرابط -->
+<div class="mt-4 p-3 border rounded bg-light">
+  <h5>📌 احتفظ بهذا الرابط!</h5>
+  <p>
+    🔹 هذا الرابط يمثل وثيقة إلكترونية لطلبك، وهو <strong>مستند رسمي معتمد</strong> يعكس حالتك في النظام.  
+    يجب عليك الاحتفاظ به .
+  </p>
+  
+  <h5>⚖️ كيف يحفظ هذا الرابط حقوقك؟</h5>
+  <ul>
+    {% if participant.status == "under_review" %}
+      <li>⏳ <strong>قيد المراجعة:</strong> يعتبر هذا الرابط <strong>سند استلام الطلب</strong> لحفظ حقوقك حتى يتم البت في الطلبية.</li>
+    {% elif participant.status == "approved" %}
+      <li>✅ <strong>مقبول:</strong> عند الموافقة، يصبح هذا الرابط <strong>سند استلام مبلغ</strong> ويثبت دفعك للمورد.</li>
+    {% else %}
+      <li>❌ <strong>مرفوض:</strong> في حالة الرفض، يعتبر الرابط بمثابة <strong>إشعار إلغاء</strong>، وإذا كنت قد دفعت، فإيصال الدفع يصبح <strong>سند استرجاع</strong>.</li>
+    {% endif %}
+  </ul>
+
+  
+
+  <p>
+    🛡️ في حال فقدان الرابط، يمكنك التواصل مع الوسيط أو فريق دعم المنصة لاسترجاع تفاصيل طلبك.
+  </p>
+  
+  <div class="alert alert-info d-flex align-items-center justify-content-between">
+    <div>
+      📎 <strong>رابط طلبك:</strong> 
+      <a href="{{ request.url }}" class="text-primary" target="_blank" id="orderLink">{{ request.url }}</a>
+    </div>
+    <button class="btn btn-sm btn-outline-primary" onclick="copyOrderLink()">
+      <i class="bi bi-clipboard"></i> نسخ
+    </button>
+  </div>
+  
+  <script>
+  function copyOrderLink() {
+    const link = document.getElementById("orderLink").textContent;
+    navigator.clipboard.writeText(link).then(() => {
+      alert("✅ تم نسخ الرابط بنجاح!");
+    }).catch(err => {
+      console.error("❌ فشل النسخ:", err);
+    });
+  }
+  </script>
+  
+</div>
+
+      <!-- ⚖️ توضيح الإجراء بناءً على الحالة -->
+      <div class="mt-4 p-3 border rounded">
+        <h5>⚠️ معلومات هامة</h5>
+        <ul>
+          {% if participant.status == "under_review" %}
+            <li>📌 طلبك لا يزال <strong>قيد المراجعة</strong>. يرجى انتظار التحديث الرسمي من الإدارة.</li>
+          {% elif participant.status == "approved" %}
+            <li>✅ الطلب مقبول، ويعتبر هذا المستند <strong>سند استلام المبلغ</strong>.</li>
+            <li>💡 يمكنك استخدامه لإثبات تحويل المبلغ للمورد عند الحاجة.</li>
+          {% else %}
+            <li>❌ الطلب مرفوض.</li>
+            <li>💳 في حال تم رفض الطلب بالخطأ أو تم استرداد المبلغ، سيكون إيصال الدفع بمثابة <strong>سند استرجاع</strong>.</li>
+          {% endif %}
+        </ul>
+      </div>
+
+     
+
+    </div>
+  </div>
+</div>
+{% endblock %}

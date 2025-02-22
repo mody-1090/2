@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  
+  <meta charset="UTF-8" />
+  <title>{% block title %}جملة - منصة الشراء بالجملة{% endblock %}</title>
+    <!-- ضع الوسم هنا مع تعديل المسار حسب ملفك -->
+    <link rel="icon" type="image/png" href="/static/images/logo.png">
+
+  <!-- Bootstrap RTL -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" />
+  <!-- ملف CSS الخاص -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  
+  <style>
+    /* شاشة التحميل بخلفية رمضانية */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0d237b, #000000); /* تدرج أخضر داكن إلى ذهبي */
+      z-index: 9999;
+      overflow: hidden;
+    }
+    /* النص الذي يظهر مع التأثير */
+    #loading-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10000;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      animation: dance 3s infinite; /* تأثير رقص/اهتزاز للنص */
+    }
+    #loading-text h1 {
+      font-size: 3rem;
+      margin: 0;
+    }
+    #loading-text p {
+      font-size: 1.2rem;
+      margin: 0.5rem 0 0;
+    }
+    /* تعريف تأثير الرقص للنص */
+    @keyframes dance {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      20% { transform: translate(-50%, -55%) rotate(-5deg); }
+      40% { transform: translate(-50%, -50%) rotate(5deg); }
+      60% { transform: translate(-50%, -55%) rotate(-5deg); }
+      80% { transform: translate(-50%, -50%) rotate(5deg); }
+      100% { transform: translate(-50%, -50%) rotate(0deg); }
+    }
+    /* إعدادات الأبواب */
+    .door {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: #2e09b4; /* لون الباب */
+    }
+    #door-left {
+      left: 0;
+      animation: doorLeftAnim 3s forwards;
+    }
+    #door-right {
+      right: 0;
+      animation: doorRightAnim 3s forwards;
+    }
+    @keyframes doorLeftAnim {
+      0% { transform: translateX(-100%); }
+      30% { transform: translateX(0); }
+      70% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    @keyframes doorRightAnim {
+      0% { transform: translateX(100%); }
+      30% { transform: translateX(0); }
+      70% { transform: translateX(0); }
+      100% { transform: translateX(100%); }
+    }
+  </style>
+</head>
+<body>
+  <!-- شاشة التحميل مع تأثير الباب والنص -->
+  <div id="loading-screen">
+    <div id="loading-text">
+      <h1>🚀 جملة</h1>
+      <p>ليست مجرد منصة، بل ثورة في عالم التوريد!</p>
+    </div>
+    <div id="door-left" class="door"></div>
+    <div id="door-right" class="door"></div>
+  </div>
+  
+  <!-- باقي محتوى الصفحة -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="nav-link" href="{{ url_for('main_routes.home') }}">جملة</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon">☰</span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.home') }}">الرئيسية</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.about') }}">عن المنصة</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.open_orders') }}">الطلبات المفتوحة</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.contact') }}">تواصل معنا</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.intermediary_training') }}">الدورة التعليمية</a></li>
+        </ul>
+        <div class="d-flex ms-auto">
+          {% if session.get('user_id') %}
+            <a class="btn btn-outline-primary me-2" href="{{ url_for('main_routes.dashboard') }}">لوحة التحكم</a>
+            <a class="btn btn-outline-primary me-2" href="{{ url_for('main_routes.profile') }}">الملف الشخصي</a>
+            <a class="btn btn-danger" href="{{ url_for('auth_routes.logout') }}">تسجيل الخروج</a>
+          {% else %}
+            <a class="btn btn-outline-primary me-2" href="{{ url_for('auth_routes.register') }}">اشترك</a>
+            <a class="btn btn-primary" href="{{ url_for('auth_routes.login') }}">تسجيل الدخول</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="container mt-4">
+    {% block content %}{% endblock %}
+  </div>
+  <footer class="bg-light text-center text-lg-start mt-4">
+    <div class="text-center p-3">
+      <span>© 2025 جميع الحقوق محفوظة لمنصة جملة</span>
+      |
+      <a href="{{ url_for('main_routes.terms') }}">الشروط والأحكام</a>
+      <a href="{{ url_for('main_routes.privacy') }}">الخصوصية</a>
+    </div>
+  </footer>
+  
+  <!-- سكربتات Bootstrap وسكربتات خاصة -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    window.onload = function() {
+      setTimeout(() => {
+        document.getElementById('loading-screen').style.display = "none";
+      }, 1100); // انتهاء التأثير بعد 3.1 ثانية
+    };
+  </script>
+</body>
+</html>

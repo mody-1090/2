@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}📦 تفاصيل الطلبية - {{ order.name }}{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">📦 تفاصيل الطلبية: <span class="text-primary">{{ order.name }}</span></h2>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0">
+      <!-- 🖼️ صورة المنتج -->
+      <img src="{{ order.image_url if order.image_url else url_for('static', filename='images/default_product.jpg') }}" alt="Product Image">
+       
+    </div>
+  </div>
+</div>
+
+  <!-- 🔍 معلومات الطلبية -->
+  <div class="col-md-6">
+    <h4>📝 وصف المنتج</h4>
+    <p>{{ order.description }}</p>
+
+    {% set approved_quantity = order.participants|selectattr("status", "equalto", "approved")|map(attribute="cartons_requested")|sum %}
+
+    <!-- 🔢 الكميات -->
+    <h5>📦 الكمية المطلوبة: {{ order.quantity_needed }}</h5>
+    <h5>✅ الكمية المكتملة: {{ approved_quantity }}</h5>
+    
+    <!-- 📊 نسبة الاكتمال -->
+    <div class="progress mb-3" style="height: 25px;">
+      {% set progress_value = (approved_quantity / order.quantity_needed) * 100 if order.quantity_needed > 0 else 0 %}
+      <div class="progress-bar bg-success" role="progressbar"
+           style="width: {{ progress_value }}%;"
+           aria-valuenow="{{ progress_value }}" aria-valuemin="0" aria-valuemax="100">
+        {{ progress_value|round|int }}%
+      </div>
+    </div>
+    
+    <!-- 🎯 مكافأة الوسيط -->
+    <p class="text-success fw-bold">
+      💰 مكسب الوسيط المتوقع:
+      <span class="text-dark"> {{ order.earnings_per_carton * 20 * order.min_contribution }} ريال </span>
+      عند إتمام 20 عميل!
+    </p>
+
+    <!-- 💰 سعر المشاركة -->
+    <h5>💰 السعر لكل كرتونة: {{ order.price_per_carton }} ريال</h5>
+    <h5>🔢 الحد الأدنى للمشاركة: {{ order.min_contribution }} كرتونة</h5>
+    <h5>💰 مكسب الوسيط لكل كرتون: {{ order.earnings_per_carton }} ريال</h5>  <!-- ✅ تمت إضافته هنا -->
+
+    <!-- 💳 معلومات الدفع والتسليم -->
+    <h5>🏙️ المدن المتاحة: {{ order.cities_available }}</h5>
+    <h5>📅 موعد إغلاق الطلبية: {{ order.closing_date.strftime('%Y-%m-%d') }}</h5>
+    <h5>🚚 موعد التسليم المتوقع: {{ order.delivery_date.strftime('%Y-%m-%d') }}</h5>
+
+    {% set approved_quantity = order.participants | selectattr("status", "equalto", "approved") | map(attribute="cartons_requested") | sum %}
+    {% set existing_participant = order.participants | selectattr("intermediary_id", "equalto", session["user_id"]) | list %}
+    
+    {% if approved_quantity < order.quantity_needed and order.intermediary_status == "open" %}
+        {% if not existing_participant %}
+        <form method="POST" action="{{ url_for('main_routes.join_order', order_id=order.id) }}">
+          <button type="submit" class="btn btn-primary btn-lg w-100">
+                🤝 انضم كوسيط في الطلبية
+              </button>
+            </form>
+        {% else %}
+            <button class="btn btn-secondary btn-lg w-100" disabled>
+              ✅ أنت بالفعل وسيط في هذه الطلبية
+            </button>
+        {% endif %}
+    {% else %}
+        <button class="btn btn-secondary btn-lg w-100" disabled>
+          🚫 الطلبية لا تحتاج إلى وسطاء إضافيين
+        </button>
+    {% endif %}
+</div>
+
+<hr>
+
+
+{% endblock %}

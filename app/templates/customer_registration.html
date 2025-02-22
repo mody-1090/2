@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}📦 تسجيل طلبية جديدة{% endblock %}
+
+{% block content %}
+<div class="container p-4">
+
+  <!-- عنوان الصفحة -->
+  <div class="row mb-4">
+    <div class="col text-center">
+      <h2 class="display-4">
+        <i class="bi bi-person-plus"></i> تسجيل طلبية جديدة
+      </h2>
+      <p class="lead text-muted">يرجى إدخال معلومات متجرك وإتمام الدفع للمورد لتسجيل الطلبية.</p>
+    </div>
+  </div>
+
+  {% if order %}
+  <!-- نموذج تسجيل الطلب -->
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0"><i class="bi bi-pencil-square"></i> نموذج التسجيل</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('main_routes.customer_registration', intermediary_id=intermediary.id, order_id=order.id) }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <!-- بيانات الطلب -->
+        <div class="mb-3">
+          <label class="form-label">🏷️ الطلبية</label>
+          <input type="text" class="form-control" value="{{ order.name }} ({{ order.quantity_needed }} كرتونة متاحة)" readonly>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">🏪 اسم المتجر أو العميل</label>
+          <input type="text" class="form-control" name="store_name" placeholder="أدخل اسم المتجر أو العميل" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">📦 عدد الكراتين المطلوبة</label>
+          <input type="number" class="form-control" name="cartons_requested" id="cartons_requested" placeholder="أدخل عدد الكراتين" min="{{ order.min_contribution }}" required>
+          <small class="text-muted">الحد الأدنى للطلب: {{ order.min_contribution }} كرتون</small>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">📍 موقع العميل</label>
+          <input type="text" class="form-control" name="location" placeholder="أدخل موقع العميل" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">👤 اسم المسؤول في المتجر</label>
+          <input type="text" class="form-control" name="responsible_person" placeholder="أدخل اسم المسؤول" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">📱 رقم جوال العميل</label>
+          <input type="text" class="form-control" name="customer_phone" placeholder="أدخل رقم جوال العميل" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">🔢 الرقم الضريبي</label>
+          <input type="text" class="form-control" name="tax_number" placeholder="أدخل الرقم الضريبي" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">📜 صورة السجل التجاري</label>
+          <input type="file" class="form-control" name="commercial_record" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">🏪 صورة لوحة المحل</label>
+          <input type="file" class="form-control" name="store_sign" required>
+        </div>
+
+
+        
+        {% if order.features %}
+        <div class="mb-3">
+          <label for="distribution_type" class="form-label">طريقة توزيع الكمية</label>
+          <select class="form-control" id="distribution_type" name="distribution_type" required>
+            <option value="equal">توزيع بالتساوي</option>
+            <option value="custom">توزيع مخصص</option>
+          </select>
+        </div>
+      
+        <div id="feature-quantity-section" style="display:none;">
+          <h5>حدد الكمية لكل ميزة:</h5>
+          {% for feature in order.features %}
+            <div class="mb-3">
+              <label class="form-label">{{ feature.name }}</label>
+              <!-- استخدام اسم الحقل المناسب لإرسال البيانات بشكل منفرد -->
+              <input type="number" class="form-control feature-quantity" data-feature-id="{{ feature.id }}" name="feature_quantities[{{ feature.id }}]" min="0" value="0">
+            </div>
+          {% endfor %}
+        </div>
+      
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            let featureSection = document.getElementById("feature-quantity-section");
+            let distributionType = document.getElementById("distribution_type");
+      
+            distributionType.addEventListener("change", function () {
+              featureSection.style.display = this.value === "custom" ? "block" : "none";
+            });
+      
+            // إظهار الحقول إذا كان "توزيع مخصص" مختار مسبقًا
+            if (distributionType.value === "custom") {
+              featureSection.style.display = "block";
+            }
+          });
+        </script>
+      {% endif %}
+      
+        <!-- تفاصيل الدفع -->
+        <h5>💵 تفاصيل الدفع</h5>
+        <p><strong>📦 المنتج:</strong> {{ order.name }}</p>
+        <p><strong>📦 عدد الكراتين المطلوبة:</strong> <span id="cartons_requested_display">{{ order.min_contribution }}</span></p>
+        <p><strong>💰 سعر الكرتون الواحد (شامل الضريبة):</strong> {{ order.price_per_carton }} ريال</p>
+
+        {% set total_amount = order.price_per_carton * order.min_contribution %}
+        <h5 class="text-danger"><strong>💰 المبلغ النهائي المطلوب تحويله:</strong> <span id="final_payment_amount">{{ total_amount|round(2) }}</span> ريال</h5>
+
+        <div class="alert alert-info mt-3">
+          📌 <strong>ملاحظة:</strong> هذا هو **المبلغ الإجمالي المطلوب تحويله** إلى المورد. يرجى التأكد من تحويل المبلغ بالكامل لضمان تأكيد طلبك.
+        </div>
+
+        <!-- تفاصيل الحساب البنكي للمورد -->
+        <div class="card mb-3 p-3 border">
+          <h5>🏦 تفاصيل الحساب البنكي للمورد</h5>
+          <p><strong>🏦 اسم البنك:</strong> {{ order.factory_agreement.bank_name if order.factory_agreement else '--' }}</p>
+          <p><strong>💳 رقم الحساب:</strong> {{ order.factory_agreement.bank_account_number if order.factory_agreement else '--' }}</p>
+          <p><strong>🔢 رقم الآيبان:</strong> {{ order.factory_agreement.iban_number if order.factory_agreement else '--' }}</p>
+          <div class="mb-3">
+            <label class="form-label">📤 رفع إيصال الدفع</label>
+            <input type="file" class="form-control" name="payment_receipt" required>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="reset" class="btn btn-secondary">
+            <i class="bi bi-arrow-counterclockwise"></i> إعادة تعيين
+          </button>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> تسجيل الطلبية
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-danger text-center">
+    ❌ لا توجد طلبية مسجلة لهذا الرابط، يرجى التواصل مع الوسيط للحصول على رابط صحيح.
+  </div>
+  {% endif %}
+</div>
+
+<script>
+document.getElementById("cartons_requested").addEventListener("input", function() {
+  let pricePerCarton = {{ order.price_per_carton }};
+  let cartonsRequested = parseInt(this.value);
+  if (isNaN(cartonsRequested) || cartonsRequested < {{ order.min_contribution }}) {
+    cartonsRequested = {{ order.min_contribution }};
+    this.value = cartonsRequested;
+  }
+  let totalAmount = pricePerCarton * cartonsRequested;
+  document.getElementById("final_payment_amount").textContent = totalAmount.toFixed(2);
+  document.getElementById("cartons_requested_display").textContent = cartonsRequested;
+});
+</script>
+{% endblock %}
