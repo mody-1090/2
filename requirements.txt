@@ -14,3 +14,4 @@ gunicorn==21.2.0  # لتشغيل التطبيق على Render
 Flask-Bcrypt==1.0.1
 psycopg2-binary==2.9.10
 boto3==1.36.19
+email-validator
