@@ -1,7 +1,7 @@
 # app/routes/main_routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app import db
-from app.models import User, WithdrawalRequest, FactoryAgreement, Order, OrderParticipant,  OrderFeature, OrderParticipantFeature ,Notification
+from app.models import User, WithdrawalRequest, FactoryAgreement, Order, OrderParticipant,  OrderFeature, OrderParticipantFeature ,Notification ,Message
 from werkzeug.utils import secure_filename
 import os, uuid
 from datetime import datetime
@@ -15,8 +15,7 @@ from app.forms import CustomerRegistrationForm, WithdrawalRequestForm, ApproveFa
 from sqlalchemy.orm import joinedload
 from app.services.database_service import allowed_file, upload_file_to_s3, get_intermediary_folder
 import json
-from app.models import Message as ContactMessage  # ✅ تجنب التعارض مع flask_mail.Message
-from flask_mail import Message  # ✅ التأكد من استيراد Message من flask_mail
+from flask_mail import Message as MailMessage
 from app.services.email_service import send_support_email, send_ticket_confirmation,   send_contact_email, send_contact_confirmation
 
 
@@ -1040,7 +1039,7 @@ def contact():
         ticket_number = f"INFO-{uuid.uuid4().hex[:8]}"
 
         # ✅ حفظ الرسالة في قاعدة البيانات
-        new_message = ContactMessage(name=name, email=email, content=message_content)
+        new_message = Message(name=name, email=email, content=message_content)
         db.session.add(new_message)
         db.session.commit()
 
