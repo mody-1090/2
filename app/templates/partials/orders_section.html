@@ -1,0 +1,232 @@
+<!-- templates/partials/orders_section.html -->
+<div class="section" id="ordersTable">
+    <style>
+      /* النمط العام */
+      #ordersTable {
+        font-family: 'Cairo', sans-serif;
+        background: #f4f7fc;
+        padding: 20px;
+      }
+      h3 {
+        font-size: 1.8rem;
+        color: #0044CC;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+      /* زر التحديث */
+      .btn.btn-info {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        border: none;
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        transition: transform 0.3s ease;
+      }
+      .btn.btn-info:hover {
+        transform: scale(1.05);
+      }
+      /* تنسيق البطاقات */
+      .card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        background: #fff;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      }
+      .card-header {
+        padding: 15px 20px;
+      }
+      .card-header.bg-warning {
+        background: linear-gradient(135deg, #f6d365, #fda085);
+        color: #4a3400;
+      }
+      .card-header.bg-success {
+        background: linear-gradient(135deg, #a8e063, #56ab2f);
+        color: #1a3c15;
+      }
+      .card-header.bg-danger {
+        background: linear-gradient(135deg, #ff758c, #ff7eb3);
+        color: #5c0a12;
+      }
+      /* تنسيق الجداول */
+      .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+      }
+      .table th,
+      .table td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 12px 15px;
+      }
+      .table thead th {
+        background: #0044CC;
+        color: #fff;
+        font-size: 1.1rem;
+      }
+      .table tbody tr {
+        background: #fff;
+        border-radius: 10px;
+        transition: background 0.3s ease;
+      }
+      .table tbody tr:hover {
+        background: #f0f8ff;
+      }
+      /* زر العرض */
+      .btn.btn-sm.btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        transition: transform 0.3s ease;
+      }
+      .btn.btn-sm.btn-primary:hover {
+        transform: scale(1.05);
+      }
+      /* تأثير بسيط على أيقونات الجداول */
+      .bi {
+        margin-right: 5px;
+      }
+    </style>
+  
+    <h3>📋 الطلبات المسجلة</h3>
+  
+    <!-- 🔄 زر تحديث الصفحة -->
+    <div class="text-end mb-3">
+      <button class="btn btn-info" onclick="location.reload();">
+        <i class="bi bi-arrow-clockwise"></i> تحديث الصفحة
+      </button>
+    </div>
+  
+    <!-- الطلبات قيد المراجعة -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0"><i class="bi bi-hourglass-split"></i> الطلبات قيد المراجعة</h4>
+      </div>
+      <div class="card-body table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>📦 الطلبية</th>
+              <th>🏪 المتجر</th>
+              <th>📦 عدد الكراتين</th>
+              <th>📍 الموقع</th>
+              <th>👤 المسؤول</th>
+              <th>📱 رقم الجوال</th>
+              <th>🔗 التفاصيل</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for participant in review_participants %}
+            <tr>
+              <td>{{ participant.order.name }}</td>
+              <td>{{ participant.store_name }}</td>
+              <td>{{ participant.cartons_requested }}</td>
+              <td>{{ participant.location }}</td>
+              <td>{{ participant.responsible_person }}</td>
+              <td>{{ participant.customer_phone }}</td>
+              <td>
+                <a href="{{ url_for('main_routes.customer_order_details', participant_id=participant.id) }}" class="btn btn-sm btn-primary">
+                  <i class="bi bi-eye"></i> عرض
+                </a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" class="text-center">لا توجد طلبات قيد المراجعة.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- الطلبات المقبولة -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-success text-white">
+        <h4 class="mb-0"><i class="bi bi-check-circle"></i> الطلبات المقبولة</h4>
+      </div>
+      <div class="card-body table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>📦 الطلبية</th>
+              <th>🏪 المتجر</th>
+              <th>📦 عدد الكراتين</th>
+              <th>📍 الموقع</th>
+              <th>👤 المسؤول</th>
+              <th>📱 رقم الجوال</th>
+              <th>🔗 التفاصيل</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for participant in approved_participants %}
+            <tr>
+              <td>{{ participant.order.name }}</td>
+              <td>{{ participant.store_name }}</td>
+              <td>{{ participant.cartons_requested }}</td>
+              <td>{{ participant.location }}</td>
+              <td>{{ participant.responsible_person }}</td>
+              <td>{{ participant.customer_phone }}</td>
+              <td>
+                <a href="{{ url_for('main_routes.customer_order_details', participant_id=participant.id) }}" class="btn btn-sm btn-primary">
+                  <i class="bi bi-eye"></i> عرض
+                </a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" class="text-center">لا توجد طلبات مقبولة.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- الطلبات المرفوضة -->
+    <div class="card shadow mb-4">
+      <div class="card-header bg-danger text-white">
+        <h4 class="mb-0"><i class="bi bi-x-circle"></i> الطلبات المرفوضة</h4>
+      </div>
+      <div class="card-body table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>📦 الطلبية</th>
+              <th>🏪 المتجر</th>
+              <th>📍 الموقع</th>
+              <th>👤 المسؤول</th>
+              <th>📱 رقم الجوال</th>
+              <th>🔗 التفاصيل</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for participant in rejected_participants %}
+            <tr>
+              <td>{{ participant.order.name }}</td>
+              <td>{{ participant.store_name }}</td>
+              <td>{{ participant.location }}</td>
+              <td>{{ participant.responsible_person }}</td>
+              <td>{{ participant.customer_phone }}</td>
+              <td>
+                <a href="{{ url_for('main_routes.customer_order_details', participant_id=participant.id) }}" class="btn btn-sm btn-primary">
+                  <i class="bi bi-eye"></i> عرض
+                </a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="text-center">لا توجد طلبات مرفوضة.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
