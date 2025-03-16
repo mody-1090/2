@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center text-primary mb-4">📩 فتح تذكرة دعم فني</h2>
+        <form method="POST" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="subject" class="form-label fw-bold">📝 الموضوع:</label>
+                <input type="text" name="subject" class="form-control" placeholder="أدخل عنوان المشكلة" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="message" class="form-label fw-bold">💬 وصف المشكلة:</label>
+                <textarea name="message" class="form-control" rows="5" placeholder="اشرح مشكلتك بالتفصيل" required></textarea>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">📤 إرسال التذكرة</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ✅ تحسين تجربة المستخدم عبر JavaScript للتحقق من الحقول -->
+<script>
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %}
