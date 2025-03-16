@@ -3,6 +3,8 @@ from app import db
 from datetime import datetime
 from flask_login import UserMixin
 import json
+from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
 
 class User(db.Model):
     __tablename__ = "users"
@@ -14,6 +16,24 @@ class User(db.Model):
     role = db.Column(db.String(15), nullable=False, default="intermediary")  # "admin" أو "intermediary"
     status = db.Column(db.String(20), nullable=False, default="active")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    reset_token = db.Column(db.String(100), unique=True, nullable=True)  # ✅ حقل جديد لحفظ رمز الاستعادة
+    def set_password(self, password):
+        """تشفير كلمة المرور عند إنشائها"""
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        """التحقق من صحة كلمة المرور"""
+        return check_password_hash(self.password, password)
+
+    def generate_reset_token(self):
+        """توليد رمز فريد لإعادة تعيين كلمة المرور"""
+        self.reset_token = str(uuid.uuid4())  # إنشاء رمز فريد
+        db.session.commit()
+
+    def clear_reset_token(self):
+        """إزالة رمز الاستعادة بعد الاستخدام"""
+        self.reset_token = None
+        db.session.commit()
 
     def __repr__(self):
         return f"<User {self.username} ({self.role})>"
