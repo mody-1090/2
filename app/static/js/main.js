@@ -32,4 +32,24 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 2000);
   }
 
- 
+  function loadSection(section, pushState = true) {
+    let endpoint = "/dashboard/" + section;
+
+    document.getElementById("content-area").innerHTML = "<div class='loading'>⏳ جاري التحميل...</div>";
+
+    fetch(endpoint)
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById("content-area").innerHTML = html;
+        if (pushState) {
+            history.pushState({ section: section }, "", "/dashboard/" + section);
+        }
+      })
+      .catch(error => console.error("Error loading section:", error));
+}
+
+window.onpopstate = function(event) {
+    if (event.state) {
+        loadSection(event.state.section, false);
+    }
+};
