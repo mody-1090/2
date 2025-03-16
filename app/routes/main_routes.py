@@ -1,7 +1,7 @@
 # app/routes/main_routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app import db
-from app.models import User, WithdrawalRequest, FactoryAgreement, Order, OrderParticipant, Message, OrderFeature, OrderParticipantFeature
+from app.models import User, WithdrawalRequest, FactoryAgreement, Order, OrderParticipant,  OrderFeature, OrderParticipantFeature ,Notification
 from werkzeug.utils import secure_filename
 import os, uuid
 from datetime import datetime
@@ -9,13 +9,15 @@ from sqlalchemy import func
 from app.services.notification_service import create_notification
 from flask import jsonify
 from app.forms import AdminRegistrationForm
-from app import db, bcrypt
+from app import db, bcrypt , mail, app
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.forms import CustomerRegistrationForm, WithdrawalRequestForm, ApproveFactoryAgreementForm
 from sqlalchemy.orm import joinedload
 from app.services.database_service import allowed_file, upload_file_to_s3, get_intermediary_folder
 import json
-
+from app.models import Message as ContactMessage  # ✅ تجنب التعارض مع flask_mail.Message
+from flask_mail import Message  # ✅ التأكد من استيراد Message من flask_mail
+from app.services.email_service import send_support_email, send_ticket_confirmation,   send_contact_email, send_contact_confirmation
 
 
 
@@ -30,7 +32,215 @@ def home():
 def about():
     return render_template("about.html")
 
+ 
 
+@main_routes.route("/intermediary/support", methods=["GET", "POST"])
+def intermediary_support():
+    if "user_id" not in session:
+        flash("❌ يجب تسجيل الدخول للوصول إلى الدعم الفني.", "danger")
+        return redirect(url_for("auth_routes.login"))
+
+    user = User.query.get(session.get("user_id"))
+    if not user:
+        flash("❌ حدث خطأ أثناء جلب بيانات المستخدم، يرجى تسجيل الدخول مرة أخرى.", "danger")
+        return redirect(url_for("auth_routes.login"))
+
+    if request.method == "POST":
+        subject = request.form.get("subject")
+        message = request.form.get("message")
+
+        if not subject or not message:
+            flash("❌ جميع الحقول مطلوبة!", "danger")
+            return redirect(url_for("main_routes.intermediary_support"))
+
+        ticket_number = f"TECH-{uuid.uuid4().hex[:8]}"  # ✅ توليد رقم تذكرة فريد
+
+        # ✅ إرسال البريد إلى فريق الدعم
+        send_support_email(user.email, user.username, subject, message, ticket_number)
+
+        # ✅ إرسال إشعار للمستخدم
+        send_ticket_confirmation(user.email, ticket_number)
+
+        flash(f"✅ تم إرسال طلب الدعم بنجاح! رقم التذكرة: {ticket_number}", "success")
+        return redirect(url_for("main_routes.dashboard"))
+
+    return render_template("intermediary_support.html", user=user)
+
+
+
+
+
+
+
+
+@main_routes.route('/add_self_order', methods=['POST'])
+def add_self_order():
+    if "user_id" not in session:
+        return redirect(url_for('main_routes.login'))
+
+    user = User.query.get(session["user_id"])
+
+    order_id = request.form.get('order_id')
+    cartons_requested = int(request.form.get('cartons_requested', 0))
+    location = request.form.get('location')
+    customer_phone = request.form.get('customer_phone')
+    distribution_type = request.form.get('distribution_type', 'توصيل')  # أو قيمة افتراضية
+
+    # الحصول على الملفات من النموذج
+    commercial_record = request.files.get("commercial_record")
+    store_sign = request.files.get("store_sign")
+    payment_receipt = request.files.get("payment_receipt")
+
+    # مسارات الملفات بعد الرفع إلى S3
+    commercial_record_path = upload_file_to_s3(commercial_record, user.id) if commercial_record and allowed_file(commercial_record.filename) else None
+    store_sign_path = upload_file_to_s3(store_sign, user.id) if store_sign and allowed_file(store_sign.filename) else None
+    payment_receipt_path = upload_file_to_s3(payment_receipt, user.id) if payment_receipt and allowed_file(payment_receipt.filename) else None
+
+    # تأكد من وجود الملفات المطلوبة
+    if not payment_receipt_path:
+        flash('يرجى إرفاق إيصال الدفع.', 'danger')
+        return redirect(url_for('main_routes.dashboard'))
+
+    # سجل الطلبية الجديدة للمستخدم نفسه
+    new_order_participant = OrderParticipant(
+        intermediary_id=user.id,
+        order_id=order_id,
+        store_name=user.username,  # بما أن المستخدم يطلب لنفسه
+        cartons_requested=cartons_requested,
+        location=location,
+        responsible_person=user.username,
+        customer_phone=customer_phone,
+        commercial_record_path=commercial_record_path,
+        store_sign_path=store_sign_path,
+        payment_receipt_path=payment_receipt_path,
+        distribution_type=distribution_type,
+        status='under_review'  # أو حسب منطقك
+    )
+
+    db.session.add(new_order_participant)
+    db.session.commit()
+
+    flash('تم تسجيل طلبك بنجاح!', 'success')
+    return redirect(url_for('main_routes.dashboard'))
+
+
+
+
+
+
+@main_routes.route('/dashboard/home_section')
+def dashboard_home_section():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    user = User.query.get(session["user_id"])
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # استعلام لجلب أحدث 5 إشعارات
+    notifications = Notification.query.filter_by(user_id=user.id)\
+                    .order_by(Notification.created_at.desc()).limit(5).all()
+
+    # جلب الطلبات التي انضم إليها الوسيط
+    participant_orders = db.session.query(Order, OrderParticipant)\
+                          .join(OrderParticipant, Order.id == OrderParticipant.order_id)\
+                          .filter(OrderParticipant.intermediary_id == user.id)\
+                          .order_by(Order.id.desc())\
+                          .all()
+
+    # جلب كافة المشاركات الخاصة بالوسيط
+    managed_participants = OrderParticipant.query.filter_by(intermediary_id=user.id).all()
+    approved_participants = [p for p in managed_participants if p.status == "approved"]
+    total_earnings = sum(p.cartons_requested * p.order.earnings_per_carton for p in approved_participants)
+
+    # حساب إجمالي السحوبات (المعلقة والمقبولة)
+    pending_or_approved_withdrawals = sum(
+        w.amount for w in WithdrawalRequest.query.filter(
+            WithdrawalRequest.intermediary_id == user.id,
+            WithdrawalRequest.status.in_(["pending", "approved"])
+        ).all()
+    )
+    net_earnings = max(0, total_earnings - pending_or_approved_withdrawals)
+
+    # جلب طلبات السحب بترتيب تنازلي
+    withdrawal_requests = WithdrawalRequest.query.filter_by(intermediary_id=user.id)\
+                          .order_by(WithdrawalRequest.created_at.desc()).all()
+
+    pending_earnings = sum(w.amount for w in withdrawal_requests if w.status == "pending")
+    withdrawn_earnings = sum(w.amount for w in withdrawal_requests if w.status == "approved")
+    rejected_earnings = sum(w.amount for w in withdrawal_requests if w.status == "rejected")
+    adjusted_total_earnings = total_earnings - pending_earnings - withdrawn_earnings + rejected_earnings
+
+    form = WithdrawalRequestForm()  # تعريف النموذج
+
+    return render_template(
+        "partials/home_section.html", 
+        user=user, 
+        notifications=notifications, 
+        participant_orders=participant_orders,
+        total_earnings=net_earnings, 
+        withdrawal_requests=withdrawal_requests,
+        pending_earnings=pending_earnings,
+        withdrawn_earnings=withdrawn_earnings,
+        adjusted_total_earnings=adjusted_total_earnings,
+        form=form
+    )
+
+
+@main_routes.route('/dashboard/orders_section')
+def dashboard_orders_section():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    user = User.query.get(session["user_id"])
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    managed_participants = OrderParticipant.query.filter_by(intermediary_id=user.id).all()
+
+    # تقسيم الطلبات حسب الحالة مع الاحتفاظ بجميع البيانات كما في الكود الأصلي
+    review_participants = [p for p in managed_participants if p.status == "under_review" and p.cartons_requested > 0]
+    approved_participants = [p for p in managed_participants if p.status == "approved" and p.cartons_requested > 0]
+    rejected_participants = [p for p in managed_participants if p.status == "rejected"]
+
+    # حساب عدد الصفحات للتقسيم
+    per_page = 5
+    total_review_pages = (len(review_participants) // per_page) + (1 if len(review_participants) % per_page > 0 else 0)
+    total_approved_pages = (len(approved_participants) // per_page) + (1 if len(approved_participants) % per_page > 0 else 0)
+    total_rejected_pages = (len(rejected_participants) // per_page) + (1 if len(rejected_participants) % per_page > 0 else 0)
+
+    return render_template(
+        "partials/orders_section.html",
+        managed_participants=managed_participants,  # ✅ مهمة جدًا لكل تفاصيل القالب
+        review_participants=review_participants,
+        approved_participants=approved_participants,
+        rejected_participants=rejected_participants,
+        per_page=per_page,
+        total_review_pages=total_review_pages,
+        total_approved_pages=total_approved_pages,
+        total_rejected_pages=total_rejected_pages
+    )
+@main_routes.route('/dashboard/add_order_section')
+def dashboard_add_order_section():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    user = User.query.get(session["user_id"])
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # جلب الطلبات التي تم تعيينها للوسيط
+    assigned_orders = Order.query.join(OrderParticipant)\
+                         .filter(OrderParticipant.intermediary_id == user.id).all()
+
+    form = WithdrawalRequestForm()  # يمكن تغييره إلى CustomerRegistrationForm إذا كان ذلك مناسبًا
+
+    return render_template(
+        "partials/add_order_section.html", 
+        user=user, 
+        assigned_orders=assigned_orders, 
+        form=form
+    )
 
 
 
@@ -821,16 +1031,30 @@ def contact():
     if request.method == "POST":
         name = request.form.get("name")
         email = request.form.get("email")
-        message = request.form.get("message")
+        message_content = request.form.get("message")
 
-        new_message = Message(name=name, email=email, content=message)
+        if not name or not email or not message_content:
+            flash("❌ جميع الحقول مطلوبة!", "danger")
+            return redirect(url_for("main_routes.contact"))
+        # ✅ توليد رقم تذكرة فريد
+        ticket_number = f"INFO-{uuid.uuid4().hex[:8]}"
+
+        # ✅ حفظ الرسالة في قاعدة البيانات
+        new_message = ContactMessage(name=name, email=email, content=message_content)
         db.session.add(new_message)
         db.session.commit()
+
+        # ✅ إرسال البريد إلى فريق التواصل مع تمرير `ticket_number`
+        send_contact_email(name, email, message_content, ticket_number)
+
+        # ✅ إرسال تأكيد للمستخدم مع تمرير `ticket_number`
+        send_contact_confirmation(name, email, ticket_number)
 
         flash("✅ تم إرسال رسالتك بنجاح!", "success")
         return redirect(url_for("main_routes.contact"))
 
     return render_template("contact.html")
+
 
 @main_routes.route('/assign-intermediary/<int:order_id>', methods=["POST"])
 def assign_intermediary(order_id):
