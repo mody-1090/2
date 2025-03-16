@@ -1,5 +1,6 @@
-{% extends "base1.html" %}
+{% extends "base.html" %}
 {% block title %}لوحة تحكم الوسيط{% endblock %}
+
 {% block content %}
 <div class="container-fluid p-4">
   <!-- عنوان الصفحة -->
@@ -8,55 +9,717 @@
       <h2 class="display-5">🎯 لوحة تحكم الوسيط - {{ user.username }}</h2>
     </div>
   </div>
+
   <div class="row">
     <!-- الشريط الجانبي للتنقل -->
     <div class="col-md-3 mb-4">
       <div class="list-group shadow">
-        <a href="#" class="list-group-item list-group-item-action active" data-section="home_section"> 
+        <!-- إعادة ترتيب عناصر القائمة -->
+        <a href="#homeSection" class="list-group-item list-group-item-action active">
           <i class="bi bi-speedometer2"></i> الرئيسية
         </a>
-        <a href="#" class="list-group-item list-group-item-action" data-section="orders_section">
+        <a href="#ordersTable" class="list-group-item list-group-item-action">
           <i class="bi bi-card-list"></i> الطلبات
         </a>
-        <a href="#" class="list-group-item list-group-item-action" data-section="add_order_section">
-          <i class="bi bi-plus-circle"></i> ابدا تجارتك
+        <a href="#addOrder" class="list-group-item list-group-item-action">
+          <i class="bi bi-plus-circle"></i> إضافة طلب
         </a>
       </div>
     </div>
-    <!-- المحتوى الرئيسي الذي سيتم تحميله ديناميكيًا -->
-    <div class="col-md-9" id="content-area">
-      <!-- سيتم تحميل المحتوى هنا عند اختيار القسم -->
+
+    <!-- المحتوى الرئيسي -->
+    <div class="col-md-9">
+      <!-- 1. قسم الرئيسية -->
+      <div class="section" id="homeSection">
+
+        <<!-- 🔔 قسم الإشعارات -->
+        <h3>🔔 الإشعارات</h3>
+        <div class="card shadow mb-4">
+          <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="bi bi-bell"></i> إشعاراتك</h4>
+            <span class="text-muted">📌 أحدث 5 إشعارات</span>
+          </div>
+          <div class="card-body table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>📅 التاريخ</th>
+                  <th>📢 الإشعار</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% set notifications = user.notifications | sort(attribute='created_at', reverse=True) %}
+                {% for notification in notifications[:5] %}
+                <tr>
+                  <td>{{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>{{ notification.message }}</td>
+                </tr>
+                {% endfor %}
+                {% if notifications | length == 0 %}
+                <tr>
+                  <td colspan="2" class="text-center">🚀 لا توجد إشعارات جديدة.</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- قسم الدعم الفني -->
+        <div class="support-section creative-support">
+          <h2>🔹 الدعم الفني</h2>
+          <p>إذا كنت تواجه مشكلة، يمكنك فتح تذكرة دعم فني.</p>
+          <a href="{{ url_for('main_routes.intermediary_support') }}" class="btn btn-primary creative-btn">فتح تذكرة دعم</a>
+        </div>
+
+        <table class="table">
+          <thead>
+              <tr>
+                  <th>#</th>
+                  <th>اسم الطلب</th>
+                  <th>حالة الطلب</th>
+                  <th>ملف الطلبية</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for order, participant in participant_orders %}
+                {% if participant.cartons_requested == 0 %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ order.name }}</td>
+                    <td>{{ participant.status }}</td>
+                    <td>
+                        {% if order.zip_file_path %}
+                            <a href="{{ order.zip_file_path }}" class="btn btn-primary btn-sm" target="_blank">📥 تحميل الملف</a>
+                        {% else %}
+                            <span class="text-muted">لا يوجد ملف</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <h3>💰 ملخص الأرباح</h3>
+        <div class="row">
+          <!-- الأرباح المحققة -->
+          <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+              <div class="card-header">💰 الأرباح المحققة</div>
+              <div class="card-body">
+                <h5 class="card-title">{{ total_earnings }} ريال</h5>
+                <p class="card-text">هذا المبلغ متاح للسحب.</p>
+              </div>
+            </div>
+          </div>
+          <!-- الأرباح قيد المراجعة -->
+          <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+              <div class="card-header">⏳ الأرباح قيد المراجعة</div>
+              <div class="card-body">
+                <h5 class="card-title">{{ pending_earnings }} ريال</h5>
+                <p class="card-text">هذا المبلغ قيد المراجعة قبل التحويل.</p>
+              </div>
+            </div>
+          </div>
+          <!-- الأرباح المسحوبة -->
+          <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+              <div class="card-header">✅ الأرباح المسحوبة</div>
+              <div class="card-body">
+                <h5 class="card-title">{{ withdrawn_earnings }} ريال</h5>
+                <p class="card-text">تم تحويل هذا المبلغ إليك.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>💰 متابعة حالة طلبات السحب</h3>
+        <div class="card shadow mb-4">
+          <div class="card-header bg-info text-white">
+            <h4 class="mb-0"><i class="bi bi-clock-history"></i> طلبات السحب</h4>
+          </div>
+          <div class="card-body table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>📅 تاريخ الطلب</th>
+                  <th>💰 المبلغ</th>
+                  <th>🏦 البنك</th>
+                  <th>💳 رقم الحساب</th>
+                  <th>🔢 الآيبان</th>
+                  <th>✅ الحالة</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for request in withdrawal_requests %}
+                <tr>
+                  <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+                  <td>{{ request.amount }} ريال</td>
+                  <td>{{ request.bank_name }}</td>
+                  <td>{{ request.account_number }}</td>
+                  <td>{{ request.iban_number }}</td>
+                  <td>
+                    {% if request.status == "pending" %}
+                      <span class="badge bg-warning">⏳ قيد المراجعة</span>
+                    {% elif request.status == "approved" %}
+                      <span class="badge bg-success">✅ مقبول</span>
+                    {% else %}
+                      <span class="badge bg-danger">❌ مرفوض</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="6" class="text-center">لا توجد طلبات سحب حتى الآن.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+          💰 طلب سحب الأرباح
+        </button>
+
+        <!-- نافذة تقديم طلب سحب الأرباح -->
+        <div class="modal fade" id="withdrawModal" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="withdrawModalLabel">طلب سحب الأرباح</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+              </div>
+              <div class="modal-body">
+                <form method="POST" action="{{ url_for('main_routes.request_withdrawal') }}">
+                  {{ form.hidden_tag() }}
+                  <!-- 🔹 اسم صاحب الحساب البنكي -->
+                  <div class="mb-3">
+                    <label class="form-label">👤 اسم صاحب الحساب</label>
+                    {{ form.account_holder(class="form-control", placeholder="أدخل اسم صاحب الحساب") }}
+                  </div>
+
+                  <!-- 🔹 اسم البنك -->
+                  <div class="mb-3">
+                    <label class="form-label">🏦 اسم البنك</label>
+                    {{ form.bank_name(class="form-control", placeholder="أدخل اسم البنك") }}
+                  </div>
+
+                  <!-- 🔹 رقم الحساب البنكي -->
+                  <div class="mb-3">
+                    <label class="form-label">💳 رقم الحساب البنكي</label>
+                    {{ form.account_number(class="form-control", placeholder="أدخل رقم الحساب") }}
+                  </div>
+
+                  <!-- 🔹 رقم الآيبان -->
+                  <div class="mb-3">
+                    <label class="form-label">🔢 رقم الآيبان</label>
+                    {{ form.iban_number(class="form-control", placeholder="أدخل رقم الآيبان") }}
+                  </div>
+
+                  <!-- 🔹 المبلغ المطلوب (لا يمكن تعديله، يعتمد على الأرباح المحققة) -->
+                  <div class="mb-3">
+                    <label class="form-label">💰 المبلغ المطلوب سحبه</label>
+                    <input type="number" class="form-control" name="amount" value="{{ total_earnings }}" readonly>
+                  </div>
+
+                  <!-- زر تقديم الطلب -->
+                  {{ form.submit(class="btn btn-success w-100") }}
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+
+      <!-- 2. قسم الطلبات المسجلة -->
+      <div class="section" id="ordersTable">
+        <h3>📋 الطلبات المسجلة</h3>
+
+        <!-- 🔄 زر تحديث الصفحة -->
+        <div class="text-end mb-3">
+          <button class="btn btn-info" onclick="location.reload();">
+            <i class="bi bi-arrow-clockwise"></i> تحديث الصفحة
+          </button>
+        </div>
+
+        <!-- الطلبات قيد المراجعة -->
+        <div class="card shadow mb-4">
+          <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0"><i class="bi bi-hourglass-split"></i> الطلبات قيد المراجعة</h4>
+          </div>
+          <div class="card-body table-responsive">
+            {% set per_page = 5 %}
+            {% set review_participants = managed_participants | selectattr("status", "equalto", "under_review") | selectattr("cartons_requested", "gt", 0) | list %}
+            {% set total_review_pages = (review_participants|length // per_page) + (1 if review_participants|length % per_page > 0 else 0) %}
+            <div id="review-pages">
+              {% for page in range(total_review_pages) %}
+                <div class="page review-page" id="review-page-{{ page }}" {% if page > 0 %}style="display: none;"{% endif %}>
+                  <table class="table table-hover align-middle">
+                    <thead>
+                      <tr>
+                        <th>📦 الطلبية</th>
+                        <th>🏪 المتجر</th>
+                        <th>📦 عدد الكراتين</th>
+                        <th>📍 الموقع</th>
+                        <th>👤 المسؤول</th>
+                        <th>📱 رقم الجوال</th>
+                        <th>🔗 التفاصيل</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for participant in review_participants[page * per_page : (page + 1) * per_page] %}
+                      <tr>
+                        <td>{{ participant.order.name }}</td>
+                        <td>{{ participant.store_name }}</td>
+                        <td>{{ participant.cartons_requested }}</td>
+                        <td>{{ participant.location }}</td>
+                        <td>{{ participant.responsible_person }}</td>
+                        <td>{{ participant.customer_phone }}</td>
+                        <td>
+                          <a href="{{ url_for('main_routes.customer_order_details', participant_id=participant.id) }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-eye"></i> عرض
+                          </a>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+              {% if total_review_pages > 1 %}
+                <button class="btn btn-warning btn-sm" onclick="changePage('review', -1)">⬅️ السابق</button>
+                <span id="review-page-indicator">صفحة 1 من {{ total_review_pages }}</span>
+                <button class="btn btn-warning btn-sm" onclick="changePage('review', 1)">التالي ➡️</button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- الطلبات المقبولة -->
+        <div class="card shadow mb-4">
+          <div class="card-header bg-success text-white">
+            <h4 class="mb-0"><i class="bi bi-check-circle"></i> الطلبات المقبولة</h4>
+          </div>
+          <div class="card-body table-responsive">
+            {% set approved_participants = managed_participants | selectattr("status", "equalto", "approved") | selectattr("cartons_requested", "gt", 0) | list %}
+            {% set total_approved_pages = (approved_participants|length // per_page) + (1 if approved_participants|length % per_page > 0 else 0) %}
+            <div id="approved-pages">
+              {% for page in range(total_approved_pages) %}
+                <div class="page approved-page" id="approved-page-{{ page }}" {% if page > 0 %}style="display: none;"{% endif %}>
+                  <table class="table table-hover align-middle">
+                    <thead>
+                      <tr>
+                        <th>📦 الطلبية</th>
+                        <th>🏪 المتجر</th>
+                        <th>📦 عدد الكراتين</th>
+                        <th>📍 الموقع</th>
+                        <th>👤 المسؤول</th>
+                        <th>📱 رقم الجوال</th>
+                        <th>🔗 التفاصيل</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for participant in approved_participants[page * per_page : (page + 1) * per_page] %}
+                      <tr>
+                        <td>{{ participant.order.name }}</td>
+                        <td>{{ participant.store_name }}</td>
+                        <td>{{ participant.cartons_requested }}</td>
+                        <td>{{ participant.location }}</td>
+                        <td>{{ participant.responsible_person }}</td>
+                        <td>{{ participant.customer_phone }}</td>
+                        <td>
+                          <a href="{{ url_for('main_routes.customer_order_details', participant_id=participant.id) }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-eye"></i> عرض
+                          </a>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+              {% if total_approved_pages > 1 %}
+                <button class="btn btn-success btn-sm" onclick="changePage('approved', -1)">⬅️ السابق</button>
+                <span id="approved-page-indicator">صفحة 1 من {{ total_approved_pages }}</span>
+                <button class="btn btn-success btn-sm" onclick="changePage('approved', 1)">التالي ➡️</button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- الطلبات المرفوضة -->
+        <div class="card shadow mb-4">
+          <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="bi bi-x-circle"></i> الطلبات المرفوضة</h4>
+          </div>
+          <div class="card-body table-responsive">
+            {% set rejected_participants = managed_participants | selectattr("status", "equalto", "rejected") | list %}
+            {% set total_rejected_pages = (rejected_participants|length // per_page) + (1 if rejected_participants|length % per_page > 0 else 0) %}
+            <div id="rejected-pages">
+              {% for page in range(total_rejected_pages) %}
+                <div class="page rejected-page" id="rejected-page-{{ page }}" {% if page > 0 %}style="display: none;"{% endif %}>
+                  <table class="table table-hover align-middle">
+                    <thead>
+                      <tr>
+                        <th>📦 الطلبية</th>
+                        <th>🏪 المتجر</th>
+                        <th>📍 الموقع</th>
+                        <th>👤 المسؤول</th>
+                        <th>📱 رقم الجوال</th>
+                        <th>🔗 التفاصيل</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for participant in rejected_participants[page * per_page : (page + 1) * per_page] %}
+                      <tr>
+                        <td>{{ participant.order.name }}</td>
+                        <td>{{ participant.store_name }}</td>
+                        <td>{{ participant.location }}</td>
+                        <td>{{ participant.responsible_person }}</td>
+                        <td>{{ participant.customer_phone }}</td>
+                        <td>
+                          <a href="{{ url_for('main_routes.customer_order_details', participant_id=participant.id) }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-eye"></i> عرض
+                          </a>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+              {% if total_rejected_pages > 1 %}
+                <button class="btn btn-danger btn-sm" onclick="changePage('rejected', -1)">⬅️ السابق</button>
+                <span id="rejected-page-indicator">صفحة 1 من {{ total_rejected_pages }}</span>
+                <button class="btn btn-danger btn-sm" onclick="changePage('rejected', 1)">التالي ➡️</button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- 3. قسم تسجيل طلب جديد -->
+      <div class="section" id="addOrder">
+        <!-- شرح آلية البيع المباشر -->
+        <div class="alert alert-info">
+          <h3>🔹 آلية البيع المباشر - كيف تصبح تاجر جملة؟</h3>
+          <p>
+            بعد انضمامك إلى الطلبية، أصبحت الآن تاجر جملة رسميًا! 🎉 وهذا يعني أنك تستطيع بيع المنتجات مباشرةً لعملائك بسهولة، دون الحاجة إلى رأس مال مسبق أو مخزون.
+          </p>
+          <h4>💼 كيف يعمل البيع المباشر؟</h4>
+          <ul>
+            <li><strong>انضم إلى الطلبية:</strong> بمجرد انضمامك، ستحصل على روابط تسجيل مخصصة لعملائك.</li>
+            <li><strong>شارك روابط التسجيل:</strong> قم بمشاركة الرابط مع عملائك عبر وسائل التواصل الاجتماعي، الواتساب، أو أي وسيلة تفضلها.</li>
+            <li><strong>العملاء يسجلون عبر رابطك:</strong> بمجرد تسجيل العملاء من خلال الرابط الخاص بك، يتم ربطهم بك مباشرة داخل النظام.</li>
+            <li><strong>استلام الطلبات وكسب الأرباح:</strong> يمكن لعملائك تقديم الطلبات مباشرة، وستحصل على أرباحك بسهولة عند قبول الطلبية.</li>
+          </ul>
+          <p>
+            🚀 <strong>بهذه الطريقة، أنت الآن تاجر جملة فعال! يمكنك بناء قاعدة عملائك وتحقيق الأرباح بدون الحاجة إلى شراء المنتجات مسبقًا.</strong>
+          </p>
+          <p>
+            🔗 <strong>انسخ رابط التسجيل المخصص لكل طلبية وابدأ البيع الآن!</strong>
+          </p>
+          
+          <!-- شرح ما يحصل عليه عملاؤك بعد التسجيل -->
+          <div class="alert alert-success">
+            <h3>📜 ماذا يحصل عليه عملاؤك بعد التسجيل؟</h3>
+            <p>
+              بمجرد أن يقوم عملاؤك بالتسجيل عبر الرابط الخاص بك وإتمام طلباتهم، سيتمكنون من الحصول على المستندات التالية حسب حالة الطلب:
+            </p>
+            <ul>
+              <li>📦 <strong>سند استلام الطلبية:</strong> يتم إصداره عند تقديم العميل لطلبه وقبوله مبدئيًا، مما يوضح أن الطلب قيد المراجعة ولم يتم تأكيده بعد.</li>
+              <li>💰 <strong>سند استلام المبلغ:</strong> يُصدر عند إتمام عملية الدفع والموافقة على الطلبية رسميًا، مما يؤكد دخول الطلب حيز التنفيذ.</li>
+              <li>🔄 <strong>سند الاسترجاع:</strong> يتم إصداره في حال إلغاء الطلب أو استرجاعه، وهو تأكيد لعملية الاسترجاع أو رفض الطلبية.</li>
+            </ul>
+            <p>
+              🔗 يمكن للعملاء الوصول إلى هذه المستندات بسهولة عبر النظام، مما يضمن الشفافية والثقة في عمليات البيع والشراء.
+            </p>
+          </div>
+        </div>
+
+        <!-- خيارات اختيار طريقة التسجيل -->
+        <div class="mb-3">
+          <label class="form-label">اختر طريقة التسجيل:</label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="registration_mode" id="manualRegistration" value="manual" checked>
+            <label class="form-check-label" for="manualRegistration">تسجيل العميل يدوي</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="registration_mode" id="selfRegistration" value="self">
+            <label class="form-check-label" for="selfRegistration">العميل يسجل نفسه عن طريق الرابط</label>
+          </div>
+        </div>
+
+        <!-- تغليف النموذج الحالي داخل قسم التسجيل اليدوي -->
+        <div id="manualRegistrationSection">
+          <h3>➕ تسجيل طلب جديد</h3>
+          <div class="card mb-4 shadow">
+            <div class="card-header bg-primary text-white">
+              <h4 class="mb-0"><i class="bi bi-pencil-square"></i> تسجيل طلب جديد</h4>
+            </div>
+            <div class="card-body">
+              <form method="POST" action="{{ url_for('main_routes.add_customer') }}" enctype="multipart/form-data">
+                <!-- 🔹 اختيار الطلبية -->
+                <div class="mb-3">
+                  <label class="form-label">🏷️ اختر الطلبية</label>
+                  <select class="form-select" name="order_id" id="order_id" required>
+                    <option value="" selected disabled>-- اختر الطلبية --</option>
+                    {% for order in assigned_orders %}
+                      <option value="{{ order.id }}" 
+                              data-price="{{ order.price_per_carton }}" 
+                              data-min="{{ order.min_contribution }}" 
+                              data-bank-name="{{ order.factory_agreement.bank_name if order.factory_agreement else '' }}"
+                              data-bank-account="{{ order.factory_agreement.bank_account_number if order.factory_agreement else '' }}"
+                              data-iban="{{ order.factory_agreement.iban_number if order.factory_agreement else '' }}"
+                              data-commercial-registration="{{ order.factory_agreement.commercial_registration if order.factory_agreement else '' }}">
+                        {{ order.name }} (الحد الأدنى: {{ order.min_contribution }} كرتون، السعر: {{ order.price_per_carton }} ريال)
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <!-- باقي نموذج تسجيل الطلب كما هو -->
+                <div class="mb-3">
+                  <label class="form-label">🏪 اسم المتجر أو العميل</label>
+                  <input type="text" class="form-control" name="store_name" placeholder="أدخل اسم المتجر أو العميل" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">📦 عدد الكراتين المطلوبة</label>
+                  <input type="number" class="form-control" name="cartons_requested" id="cartons_requested" min="1" required>
+                  <small class="text-muted">يجب أن يكون العدد على الأقل الحد الأدنى المطلوب.</small>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">📍 موقع العميل</label>
+                  <input type="text" class="form-control" name="location" placeholder="أدخل موقع العميل" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">👤 اسم المسؤول</label>
+                  <input type="text" class="form-control" name="responsible_person" placeholder="أدخل اسم المسؤول" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">📱 رقم جوال العميل</label>
+                  <input type="text" class="form-control" name="customer_phone" placeholder="أدخل رقم جوال العميل" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">🔢 الرقم الضريبي</label>
+                  <input type="text" class="form-control" name="tax_number" placeholder="أدخل الرقم الضريبي" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">📜 صورة السجل التجاري</label>
+                  <input type="file" class="form-control" name="commercial_record" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">🏪 صورة لوحة المحل</label>
+                  <input type="file" class="form-control" name="store_sign" required>
+                </div>
+
+                <!-- 🔹 تفاصيل الحساب البنكي -->
+                <div class="card mb-3 p-3 border">
+                  <h5>🏦 تفاصيل الحساب البنكي</h5>
+                  <p>عند تسجيل الطلب، يجب عليك الدفع مباشرة إلى المورد.</p>
+                  <p><strong>💰 المبلغ المطلوب:</strong> <span id="payment_amount">0</span> ريال</p>
+                  <p><strong>🏦 اسم البنك:</strong> <span id="bank_name">الراجحي / شركة محمد حسن محمد الحربي لتجارة الجملة والتجزئة</span></p>
+                  <p><strong>💳 رقم الحساب:</strong> <span id="bank_account">--</span></p>
+                  <p><strong>🔢 رقم الآيبان:</strong> <span id="iban_number">SA9480000589608016204363</span></p>
+                  <p><strong>📜 السجل التجاري:</strong> <span id="commercial_registration">--</span></p>
+                </div>
+
+                <!-- 🔹 رفع إيصال الدفع -->
+                <div class="mb-3">
+                  <label class="form-label">📤 رفع إيصال الدفع</label>
+                  <input type="file" class="form-control" name="payment_receipt" required>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                  <button type="reset" class="btn btn-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i> إعادة تعيين
+                  </button>
+                  <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> تسجيل العميل
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- قسم روابط التسجيل الذاتي -->
+        <div id="selfRegistrationSection" style="display: none;">
+          <h3>📌 روابط تسجيل العملاء لكل طلبية</h3>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>📦 اسم الطلبية</th>
+                <th>🔗 رابط التسجيل</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in assigned_orders %}
+              <tr>
+                <td>{{ order.name }}</td>
+                <td>
+                  <input type="text" class="form-control" value="{{ url_for('main_routes.customer_registration', intermediary_id=user.id, order_id=order.id, _external=True) }}" readonly>
+                  <button class="btn btn-sm btn-primary mt-2" onclick="copyToClipboard(this)">📋 نسخ الرابط</button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- نوافذ ونصوص الجافا سكريبت تبقى دون تغيير -->
+      <script>
+      // دالة النسخ
+      function copyToClipboard(button) {
+          var input = button.previousElementSibling;
+          input.select();
+          input.setSelectionRange(0, 99999);
+          document.execCommand("copy");
+          button.innerText = "✅ تم النسخ";
+          setTimeout(() => {
+              button.innerText = "📋 نسخ الرابط";
+          }, 2000);
+      }
+
+      // عند تحميل الصفحة يتم إظهار القسم المناسب
+      document.addEventListener("DOMContentLoaded", function() {
+          const sections = document.querySelectorAll(".section");
+          function showSection(sectionId) {
+              sections.forEach(section => {
+                  section.style.display = section.id === sectionId ? "block" : "none";
+              });
+          }
+
+          // التحقق من وجود هاش في URL وإظهاره، وإذا لم يوجد يتم إظهار "homeSection"
+          let hash = window.location.hash.substring(1);
+          if (hash && document.getElementById(hash)) {
+              showSection(hash);
+          } else {
+              showSection("homeSection");
+          }
+
+          // إضافة حدث النقر على روابط القائمة الجانبية لتبديل الأقسام
+          const navLinks = document.querySelectorAll(".list-group-item[href^='#']");
+          navLinks.forEach(link => {
+              link.addEventListener("click", function(e) {
+                  e.preventDefault();
+                  const targetId = this.getAttribute("href").substring(1);
+                  showSection(targetId);
+                  history.pushState(null, "", "#" + targetId);
+                  navLinks.forEach(nav => nav.classList.remove("active"));
+                  this.classList.add("active");
+              });
+          });
+      });
+      </script>
+
+      <script>
+      document.getElementById("order_id").addEventListener("change", function() {
+          let selectedOption = this.options[this.selectedIndex];
+          let pricePerCarton = parseFloat(selectedOption.getAttribute("data-price"));
+          let minContribution = parseInt(selectedOption.getAttribute("data-min"));
+
+          let cartonsInput = document.getElementById("cartons_requested");
+          cartonsInput.setAttribute("min", minContribution);
+          cartonsInput.value = minContribution;
+
+          let totalAmount = pricePerCarton * minContribution;
+          document.getElementById("payment_amount").textContent = totalAmount.toFixed(2);
+
+          let bankName = selectedOption.getAttribute("data-bank-name") || "--";
+          let bankAccount = selectedOption.getAttribute("data-bank-account") || "--";
+          let ibanNumber = selectedOption.getAttribute("data-iban") || "--";
+          let commercialRegistration = selectedOption.getAttribute("data-commercial-registration") || "--";
+
+          document.getElementById("bank_name").textContent = bankName;
+          document.getElementById("bank_account").textContent = bankAccount;
+          document.getElementById("iban_number").textContent = ibanNumber;
+          document.getElementById("commercial_registration").textContent = commercialRegistration;
+      });
+
+      document.getElementById("cartons_requested").addEventListener("input", function() {
+          let selectedOption = document.getElementById("order_id").options[document.getElementById("order_id").selectedIndex];
+          let pricePerCarton = parseFloat(selectedOption.getAttribute("data-price"));
+
+          let cartonsRequested = parseInt(this.value);
+          if (isNaN(cartonsRequested) || cartonsRequested < parseInt(selectedOption.getAttribute("data-min"))) {
+              cartonsRequested = parseInt(selectedOption.getAttribute("data-min"));
+              this.value = cartonsRequested;
+          }
+
+          let totalAmount = pricePerCarton * cartonsRequested;
+          document.getElementById("payment_amount").textContent = totalAmount.toFixed(2);
+      });
+      </script>
+      <script>
+        document.querySelectorAll('input[name="registration_mode"]').forEach((elem) => {
+          elem.addEventListener("change", function() {
+            if(this.value === "manual") {
+              document.getElementById("manualRegistrationSection").style.display = "block";
+              document.getElementById("selfRegistrationSection").style.display = "none";
+            } else if(this.value === "self") {
+              document.getElementById("manualRegistrationSection").style.display = "none";
+              document.getElementById("selfRegistrationSection").style.display = "block";
+            }
+          });
+        });
+      </script>
+      <script>
+        function changePage(section, direction) {
+          let currentPageElement = document.getElementById(`${section}-page-indicator`);
+          let currentPage = parseInt(currentPageElement.textContent.split(" ")[1]);
+          let totalPages = parseInt(currentPageElement.textContent.split(" ")[3]);
+        
+          let newPage = currentPage + direction;
+          if (newPage < 1 || newPage > totalPages) return;
+        
+          document.getElementById(`${section}-page-${currentPage - 1}`).style.display = "none";
+          document.getElementById(`${section}-page-${newPage - 1}`).style.display = "block";
+          currentPageElement.textContent = `صفحة ${newPage} من ${totalPages}`;
+        }
+      </script>
+      
+
+
+
+
+      <script>
+        document.getElementById("myForm").addEventListener("submit", function(e) {
+          e.preventDefault(); // منع إعادة تحميل الصفحة
+          let formData = new FormData(this);
+          fetch(this.action, {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            // تحديث عناصر الصفحة بناءً على بيانات الاستجابة
+            console.log(data);
+          })
+          .catch(error => console.error('Error:', error));
+        });
+      </script>
     </div>
   </div>
 </div>
-
-<script>
-  // دالة لتحميل القسم المطلوب عبر AJAX
-  function loadSection(section) {
-    let endpoint = "/dashboard/" + section;
-    fetch(endpoint)
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById("content-area").innerHTML = html;
-      })
-      .catch(error => console.error("Error loading section:", error));
-  }
-
-  document.addEventListener("DOMContentLoaded", function() {
-    // تحميل القسم الافتراضي (الرئيسية) عند فتح الصفحة
-    loadSection("home_section");
-
-    // إضافة مستمعي النقر لعناصر القائمة الجانبية
-    const navLinks = document.querySelectorAll(".list-group-item");
-    navLinks.forEach(link => {
-      link.addEventListener("click", function(e) {
-        e.preventDefault();
-        navLinks.forEach(l => l.classList.remove("active"));
-        this.classList.add("active");
-        let section = this.getAttribute("data-section");
-        loadSection(section);
-      });
-    });
-  });
-</script>
 {% endblock %}
