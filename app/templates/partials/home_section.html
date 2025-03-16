@@ -1,0 +1,254 @@
+<!-- templates/partials/home_section.html -->
+<div class="section" id="homeSection">
+    <!-- 🔔 قسم الإشعارات -->
+    <h3 class="section-header">🔔 الإشعارات</h3>
+    <div class="card shadow mb-4 creative-card">
+      <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="bi bi-bell"></i> إشعاراتك</h4>
+        <span class="text-muted">📌 أحدث 5 إشعارات</span>
+      </div>
+      <div class="card-body table-responsive creative-table">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>📅 التاريخ</th>
+              <th>📢 الإشعار</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% set notifications = user.notifications | sort(attribute='created_at', reverse=True) %}
+            {% for notification in notifications[:5] %}
+            <tr>
+              <td>{{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+              <td>{{ notification.message }}</td>
+            </tr>
+            {% endfor %}
+            {% if notifications | length == 0 %}
+            <tr>
+              <td colspan="2" class="text-center">🚀 لا توجد إشعارات جديدة.</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- جدول الطلبات -->
+    <table class="table creative-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>اسم الطلب</th>
+          <th>حالة الطلب</th>
+          <th>ملف الطلبية</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order, participant in participant_orders %}
+          {% if participant.cartons_requested == 0 %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ order.name }}</td>
+            <td>{{ participant.status }}</td>
+            <td>
+              {% if order.zip_file_path %}
+                <a href="{{ order.zip_file_path }}" class="btn btn-primary btn-sm creative-btn" target="_blank">📥 تحميل الملف</a>
+              {% else %}
+                <span class="text-muted">لا يوجد ملف</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  
+    <!-- قسم الدعم الفني -->
+    <div class="support-section creative-support">
+      <h2>🔹 الدعم الفني</h2>
+      <p>إذا كنت تواجه مشكلة، يمكنك فتح تذكرة دعم فني.</p>
+      <a href="{{ url_for('main_routes.intermediary_support') }}" class="btn btn-primary creative-btn">فتح تذكرة دعم</a>
+    </div>
+  
+    <!-- ملخص الأرباح -->
+    <h3 class="section-header">💰 ملخص الأرباح</h3>
+    <div class="row creative-earnings">
+      <!-- الأرباح المحققة -->
+      <div class="col-md-4">
+        <div class="card text-white bg-success mb-3 creative-card">
+          <div class="card-header">💰 الأرباح المحققة</div>
+          <div class="card-body">
+            <h5 class="card-title">{{ total_earnings }} ريال</h5>
+            <p class="card-text">هذا المبلغ متاح للسحب.</p>
+          </div>
+        </div>
+      </div>
+      <!-- الأرباح قيد المراجعة -->
+      <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3 creative-card">
+          <div class="card-header">⏳ الأرباح قيد المراجعة</div>
+          <div class="card-body">
+            <h5 class="card-title">{{ pending_earnings }} ريال</h5>
+            <p class="card-text">هذا المبلغ قيد المراجعة قبل التحويل.</p>
+          </div>
+        </div>
+      </div>
+      <!-- الأرباح المسحوبة -->
+      <div class="col-md-4">
+        <div class="card text-white bg-info mb-3 creative-card">
+          <div class="card-header">✅ الأرباح المسحوبة</div>
+          <div class="card-body">
+            <h5 class="card-title">{{ withdrawn_earnings }} ريال</h5>
+            <p class="card-text">تم تحويل هذا المبلغ إليك.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- متابعة حالة طلبات السحب -->
+    <h3 class="section-header">💰 متابعة حالة طلبات السحب</h3>
+    <div class="card shadow mb-4 creative-card">
+      <div class="card-header bg-info text-white">
+        <h4 class="mb-0"><i class="bi bi-clock-history"></i> طلبات السحب</h4>
+      </div>
+      <div class="card-body table-responsive creative-table">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>📅 تاريخ الطلب</th>
+              <th>💰 المبلغ</th>
+              <th>🏦 البنك</th>
+              <th>💳 رقم الحساب</th>
+              <th>🔢 الآيبان</th>
+              <th>✅ الحالة</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for request in withdrawal_requests %}
+            <tr>
+              <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+              <td>{{ request.amount }} ريال</td>
+              <td>{{ request.bank_name }}</td>
+              <td>{{ request.account_number }}</td>
+              <td>{{ request.iban_number }}</td>
+              <td>
+                {% if request.status == "pending" %}
+                  <span class="badge bg-warning">⏳ قيد المراجعة</span>
+                {% elif request.status == "approved" %}
+                  <span class="badge bg-success">✅ مقبول</span>
+                {% else %}
+                  <span class="badge bg-danger">❌ مرفوض</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="text-center">لا توجد طلبات سحب حتى الآن.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- زر طلب سحب الأرباح -->
+    <button type="button" class="btn btn-primary creative-btn" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+      💰 طلب سحب الأرباح
+    </button>
+  
+    <!-- نافذة تقديم طلب سحب الأرباح -->
+    <div class="modal fade creative-modal" id="withdrawModal" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content creative-modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="withdrawModalLabel">طلب سحب الأرباح</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" action="{{ url_for('main_routes.request_withdrawal') }}">
+              {{ form.hidden_tag() }}
+              <!-- 🔹 اسم صاحب الحساب البنكي -->
+              <div class="mb-3">
+                <label class="form-label">👤 اسم صاحب الحساب</label>
+                {{ form.account_holder(class="form-control", placeholder="أدخل اسم صاحب الحساب") }}
+              </div>
+              <!-- 🔹 اسم البنك -->
+              <div class="mb-3">
+                <label class="form-label">🏦 اسم البنك</label>
+                {{ form.bank_name(class="form-control", placeholder="أدخل اسم البنك") }}
+              </div>
+              <!-- 🔹 رقم الحساب البنكي -->
+              <div class="mb-3">
+                <label class="form-label">💳 رقم الحساب البنكي</label>
+                {{ form.account_number(class="form-control", placeholder="أدخل رقم الحساب") }}
+              </div>
+              <!-- 🔹 رقم الآيبان -->
+              <div class="mb-3">
+                <label class="form-label">🔢 رقم الآيبان</label>
+                {{ form.iban_number(class="form-control", placeholder="أدخل رقم الآيبان") }}
+              </div>
+              <!-- 🔹 المبلغ المطلوب سحبه -->
+              <div class="mb-3">
+                <label class="form-label">💰 المبلغ المطلوب سحبه</label>
+                <input type="number" class="form-control" name="amount" value="{{ total_earnings }}" readonly>
+              </div>
+              <!-- زر تقديم الطلب -->
+              {{ form.submit(class="btn btn-success w-100 creative-btn") }}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- أنماط إضافية لتعزيز التصميم الإبداعي -->
+  <style>
+    /* عناوين الأقسام */
+    .section-header {
+      font-size: 2rem;
+      margin: 2rem 0 1rem;
+      text-align: center;
+      color: #0044CC;
+    }
+    /* تأثير الظل والحواف المستديرة للبطاقات */
+    .creative-card {
+      border-radius: 15px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .creative-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+    /* تحسين تنسيق الجداول */
+    .creative-table table {
+      border-collapse: separate;
+      border-spacing: 0 10px;
+    }
+    .creative-table th,
+    .creative-table td {
+      vertical-align: middle;
+    }
+    /* أزرار تفاعلية بتأثير ناعم */
+    .creative-btn {
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .creative-btn:hover {
+      background-color: #003399;
+      transform: translateY(-3px);
+    }
+    /* تنسيق الـ modal */
+    .creative-modal-content {
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    /* قسم الدعم الفني */
+    .creative-support {
+      margin: 3rem 0;
+      text-align: center;
+      background: #f0f8ff;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+  </style>
+  
