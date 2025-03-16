@@ -20,5 +20,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   
+  // دالة النسخ
+  function copyToClipboard(button) {
+      var input = button.previousElementSibling;
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      button.innerText = "✅ تم النسخ";
+      setTimeout(() => {
+          button.innerText = "📋 نسخ الرابط";
+      }, 2000);
+  }
 
-
+ 
