@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base1.html" %}
 
 {% block title %}لوحة تحكم المشرف{% endblock %}
 
@@ -913,7 +913,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for intermediary in intermediaries[:12] %}
+            {% for intermediary in intermediaries %}
             <tr>
               <td>
                 <a href="{{ url_for('main_routes.intermediary_details', intermediary_id=intermediary.id) }}" class="text-decoration-none">
