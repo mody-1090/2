@@ -23,7 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    background: linear-gradient(135deg, #000000, #2575fc);
     background-size: 200% 200%;
     animation: bgGradient 10s ease infinite;
     overflow: hidden;
@@ -206,6 +206,43 @@
     flex: 1 1 22%;
     min-width: 250px;
   }
+
+
+/* قسم معرض الصور والفيديوهات الإبداعي */
+#media-gallery {
+  padding: 4rem 0;
+  background: #fff;
+}
+#media-gallery .intro {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 0 1rem;
+}
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.gallery-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+.gallery-item img,
+.gallery-item video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 15px;
+}
+
+  
 </style>
 
 <!-- قسم البطل والتوثيق المدمج بصورة إبداعية -->
@@ -225,6 +262,10 @@
     </div>
   </div>
 </section>
+
+
+
+
 
 <!-- فاصل تصميم مبتكر -->
 <div class="divider"></div>
@@ -305,6 +346,13 @@
   </div>
 </section>
 
+
+
+
+
+
+
+
 <!-- فاصل تصميم مبتكر -->
 <div class="divider"></div>
 
@@ -367,5 +415,47 @@
     </div>
   </div>
 </section>
+
+
+
+
+
+
+
+<!-- معرض الصور والفيديوهات الإبداعي -->
+<section id="media-gallery">
+  <div class="container">
+    <div class="intro">
+      <h2>معرض الصور والفيديوهات</h2>
+      <p class="lead"></p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item">
+        <img src="/static/images/gallery1.jpg" alt="معرض الصورة 1">
+      </div>
+      <div class="gallery-item">
+        <img src="/static/images/gallery2.jpg" alt="معرض الصورة 2">
+      </div>
+      <div class="gallery-item">
+        <img src="/static/images/gallery3.jpg" alt="معرض الصورة 3">
+      </div>
+      <div class="gallery-item">
+        <img src="/static/images/gallery4.jpg" alt="معرض الصورة 4">
+      </div>
+      <div class="gallery-item video-item">
+        <video src="/static/videos/video1.mp4" autoplay muted loop playsinline poster="/static/images/video-poster1.jpg"></video>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
 
 {% endblock %}
