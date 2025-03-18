@@ -270,6 +270,126 @@
 <!-- فاصل تصميم مبتكر -->
 <div class="divider"></div>
 
+
+
+<!-- فاصل تصميم مبتكر -->
+<div class="divider"></div>
+<!-- قسم آخر المقالات - إبداعي واحترافي -->
+<section id="latest-articles">
+  <div class="container">
+    <div class="intro">
+      <h2>📰 مقالات مُلهمة</h2>
+      <p class="lead">استمتع بأحدث المقالات الملهمة حول التجارة وريادة الأعمال، واستكشف أفكارًا جديدة تثري معرفتك.</p>
+    </div>
+    <div class="articles-slider">
+      {% for article in latest_articles %}
+      <div class="article-card">
+        <div class="article-image">
+          {% if article.image_path %}
+            <img src="{{ article.image_path }}" alt="{{ article.title }}">
+          {% else %}
+            <img src="/static/images/default-article.jpg" alt="صورة افتراضية">
+          {% endif %}
+          <div class="overlay"></div>
+        </div>
+        <div class="article-content">
+          <h3>{{ article.title }}</h3>
+          <p>{{ article.content[:120] | safe }}...</p>
+          <a href="{{ url_for('main_routes.blog_detail', blog_id=article.id) }}" class="read-more">📖 اقرأ المزيد</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+/* تصميم إبداعي لقسم المقالات */
+#latest-articles {
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+  padding: 4rem 0;
+  text-align: center;
+}
+.intro h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.intro p {
+  font-size: 1.2rem;
+  color: #555;
+}
+.articles-slider {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 1rem;
+  scroll-snap-type: x mandatory;
+}
+.article-card {
+  background: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  flex: 0 0 320px;
+  scroll-snap-align: center;
+  position: relative;
+}
+.article-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+.article-image {
+  position: relative;
+  height: 200px;
+}
+.article-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+.article-image .overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+.article-card:hover .overlay {
+  opacity: 1;
+}
+.article-content {
+  padding: 1.2rem;
+  text-align: left;
+}
+.article-content h3 {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 0.5rem;
+}
+.article-content p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+.read-more {
+  display: inline-block;
+  font-weight: bold;
+  color: #ff5733;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.read-more:hover {
+  color: #c70039;
+}
+</style>
+
 <!-- قسم كيف تصبح تاجر جملة؟ -->
 <section id="become-trader">
   <div class="container">
@@ -415,6 +535,8 @@
     </div>
   </div>
 </section>
+
+
 
 
 
