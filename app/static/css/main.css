@@ -213,3 +213,207 @@ footer a:hover {
     border-radius: 0;
   }
 }
+
+
+
+/* شبكة عرض المدونات */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* بطاقة المدونة */
+.blog-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+}
+
+/* خلفية الصورة وعرض العنوان */
+.blog-image {
+  position: relative;
+  height: 250px;
+  background-size: cover;
+  background-position: center;
+}
+
+.blog-image .overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.blog-title {
+  margin: 0;
+  font-size: 1.3em;
+  color: #fff;
+}
+
+.blog-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* محتوى بطاقة المدونة */
+.blog-content {
+  padding: 15px;
+}
+
+.blog-excerpt {
+  font-size: 0.95em;
+  color: #555;
+}
+
+/* زر "قراءة المزيد" */
+.btn.read-more-btn {
+  display: inline-block;
+  background: #00539C;
+  color: #fff;
+  padding: 10px 15px;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
+
+.btn.read-more-btn:hover {
+  background: #003F7F;
+}
+
+
+/* تصميم صفحة تفاصيل المدونة */
+.blog-detail-page {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* قسم الصورة الرئيسية */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.hero .blog-title {
+  font-size: 2.8em;
+  color: #fff;
+  margin: 0;
+}
+
+.hero .post-date {
+  color: #ddd;
+  margin-top: 10px;
+  font-size: 1.2em;
+}
+
+/* قسم المحتوى الرئيسي */
+.blog-content {
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+}
+
+.content-container {
+  font-size: 1.1em;
+  text-align: justify;
+}
+
+/* شريط المشاركة */
+.share-bar {
+  margin: 40px auto;
+  text-align: center;
+  padding: 20px 0;
+  border-top: 1px solid #ddd;
+}
+
+.share-bar p {
+  font-size: 1.1em;
+  margin-bottom: 10px;
+}
+
+.share-link {
+  display: inline-block;
+  margin: 0 10px;
+  color: #00539C;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.share-link:hover {
+  color: #003F7F;
+}
+
+
+
+
+/* توسيط النص داخل المحرر */
+.ql-editor {
+  text-align: center; /* محاذاة النص للمنتصف */
+  direction: rtl; /* الكتابة من اليمين إلى اليسار */
+}
+
+/* جعل نموذج الإدخال في المنتصف */
+.blog-form {
+  width: 60%;
+  margin: 0 auto; /* توسيط النموذج */
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: center; /* توسيط النص */
+}
+
+.form-group label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* تنسيق زر النشر */
+.submit-btn {
+  display: block;
+  width: 100%;
+  background: #28a745;
+  color: #fff;
+  padding: 12px;
+  font-size: 18px;
+  border-radius: 5px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s;
+}
+
+.submit-btn:hover {
+  background: #218838;
+}
