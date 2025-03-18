@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ blog.title }}{% endblock %}
+
+{% block content %}
+<article class="blog-detail-page">
+  <!-- قسم البطل -->
+  <section class="hero" style="background-image: url('{{ blog.image_path if blog.image_path else url_for('static', filename='images/default.jpg') }}');">
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1 class="blog-title">{{ blog.title }}</h1>
+        <p class="post-date">تم النشر بتاريخ: {{ blog.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+      </div>
+      <div class="wave" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- محتوى المدونة -->
+  <section class="blog-content">
+    <div class="content-container">
+      <div class="article-content">
+        {{ blog.content | safe }}
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم دعوة لصفحة المقالات -->
+  <section id="latest-articles">
+    <div class="container">
+      <div class="intro">
+        <h2>📰 مقالات مُلهمة</h2>
+        <p class="lead">استمتع بأحدث المقالات الملهمة حول التجارة وريادة الأعمال، واستكشف أفكارًا جديدة تثري معرفتك.</p>
+      </div>
+      <div class="articles-button">
+        <a href="{{ url_for('main_routes.blog_list') }}" class="all-articles-btn">صفحة المقالات</a>
+      </div>
+    </div>
+  </section>
+</article>
+{% endblock %}
+
+<style>
+/* التنسيق العام */
+.blog-detail-page {
+  overflow-x: hidden;
+  font-family: 'Tajawal', sans-serif;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* قسم البطل */
+.hero {
+  position: relative;
+  height: 70vh;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.hero-overlay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.hero-content {
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+}
+.blog-title {
+  font-size: 3rem;
+  color: #fff;
+  margin: 0;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+}
+.post-date {
+  font-size: 1rem;
+  color: #f0f0f0;
+  margin-top: 0.5rem;
+}
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmIiB2aWV3Qm94PSIwIDAgMTQ0MCAxMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGgxNDR2OTBWMEw3MjAuOSA4MkwxNDQwIDAgMCAweiIvPjwvc3ZnPg==') repeat-x;
+  background-size: cover;
+}
+
+/* محتوى المدونة */
+.blog-content {
+  background: #fff;
+  padding: 3rem 1rem;
+}
+.content-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.article-content {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  line-height: 1.7;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+/* قسم دعوة لصفحة المقالات */
+#latest-articles {
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+  padding: 4rem 0;
+  text-align: center;
+}
+#latest-articles .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+.intro h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.intro p.lead {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 2rem;
+}
+.articles-button {
+  display: flex;
+  justify-content: center;
+}
+.all-articles-btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background: #e67e22;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+.all-articles-btn:hover {
+  background: #d35400;
+}
+</style>
