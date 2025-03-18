@@ -1,7 +1,7 @@
 # app/routes/main_routes.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app import db
-from app.models import User, WithdrawalRequest, FactoryAgreement, Order, OrderParticipant,  OrderFeature, OrderParticipantFeature ,Notification ,Message
+from app.models import User, WithdrawalRequest, FactoryAgreement, Order, OrderParticipant,  OrderFeature, OrderParticipantFeature ,Notification ,Message ,BlogPost
 from werkzeug.utils import secure_filename
 import os, uuid
 from datetime import datetime
