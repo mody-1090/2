@@ -6,12 +6,7 @@
 <div class="container blog-page">
   <header class="page-header">
     <h1 class="page-title">جميع المدونات</h1>
-    <a href="{{ url_for('main_routes.create_blog') }}" class="btn add-blog-btn">+ إضافة مدونة جديدة</a>
 
-    <!-- نموذج زر حذف جميع المدونات مع تأكيد قبل التنفيذ -->
-    <form action="{{ url_for('main_routes.delete_all_blogs') }}" method="post" onsubmit="return confirm('هل أنت متأكد من حذف جميع المدونات؟');" style="margin-top: 20px;">
-        <button type="submit" class="btn delete-all-btn">حذف جميع المدونات</button>
-    </form>
   </header>
   
   <section class="blog-grid">
