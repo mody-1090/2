@@ -25,13 +25,72 @@ main_routes = Blueprint('main_routes', __name__)
 
 @main_routes.route('/')
 def home():
-    return render_template("index.html")
+    latest_articles = BlogPost.query.order_by(BlogPost.created_at.desc()).limit(6).all()
+    return render_template("index.html", latest_articles=latest_articles)
+
 
 @main_routes.route('/about')
 def about():
     return render_template("about.html")
 
  
+
+# صفحة عرض جميع المدونات
+@main_routes.route('/blogs')
+def blog_list():
+    blogs = BlogPost.query.order_by(BlogPost.created_at.desc()).all()
+    return render_template('blogs.html', blogs=blogs)
+
+# صفحة عرض مدونة منفصلة بناءً على ID
+@main_routes.route('/blogs/<int:blog_id>')
+def blog_detail(blog_id):
+    
+    blog = BlogPost.query.get_or_404(blog_id)
+
+    latest_articles = BlogPost.query.order_by(BlogPost.created_at.desc()).limit(4).all()
+    return render_template('blog_detail.html', blog=blog, latest_articles=latest_articles)
+
+
+
+
+@main_routes.route('/delete_all', methods=['POST'])
+def delete_all_blogs():
+    # حذف جميع المدونات من قاعدة البيانات
+    BlogPost.query.delete()
+    db.session.commit()
+    return redirect(url_for('main_routes.blog_list'))
+
+
+
+
+# صفحة إنشاء المدونة
+@main_routes.route('/create', methods=['GET', 'POST'])
+def create_blog():
+
+    if "user_id" not in session:
+        flash("يجب تسجيل الدخول.", "danger")
+        return redirect(url_for("auth_routes.login"))
+    user = User.query.get(session["user_id"])
+    if user.role != "admin":
+        flash("❌ ليس لديك الصلاحية لتعديل الطلبات.", "danger")
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        image_file = request.files.get('image')
+
+        image_url = None
+        if image_file and image_file.filename != "":
+           image_url = upload_file_to_s3(image_file, user.id)
+
+        # إنشاء المدونة وحفظها في قاعدة البيانات
+        blog_post = BlogPost(title=title, content=content, image_path=image_url)
+        db.session.add(blog_post)
+        db.session.commit()
+
+        return redirect(url_for('main_routes.blog_list'))
+    
+    return render_template('create_blog.html')
+
 
 @main_routes.route("/intermediary/support", methods=["GET", "POST"])
 def intermediary_support():
