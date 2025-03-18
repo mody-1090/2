@@ -40,6 +40,20 @@ class User(db.Model):
 
 
 
+class BlogPost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    image_path = db.Column(db.String(255), nullable=True)  # رابط الصورة المخزنة
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+
+
+
+
+
+
 
 class WithdrawalRequest(db.Model):
     __tablename__ = "withdrawal_requests"
