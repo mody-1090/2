@@ -121,12 +121,14 @@
         <span class="navbar-toggler-icon">☰</span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.home') }}">الرئيسية</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.about') }}">عن المنصة</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.open_orders') }}">الطلبات المفتوحة</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.contact') }}">تواصل معنا</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.intermediary_training') }}">الدورة التعليمية</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main_routes.blog_list') }}">المقالات</a></li>
+
         </ul>
         <div class="d-flex ms-auto">
           {% if session.get('user_id') %}
